@@ -29,17 +29,26 @@ PhoenixBank has been entirely rebuilt using a **Microservices Architecture** wit
    - **Tech Stack**: NestJS, Kafka Client.
    - **Features**: A fully isolated service. Exposes a `POST /payments/transfer` API. It validates requests and publishes a `transfer-initiated` event to Kafka without synchronously blocking the ledger.
 
+5. **API Gateway (`kong/`)**
+   - **Tech Stack**: Kong (DB-less mode).
+   - **Features**: Single entry point for all frontend/mobile requests (Port 8000), configured with a strict Rate-Limiting plugin (20 req/min) for DDoS protection.
+
+6. **Mobile App (`mobile/`)**
+   - **Tech Stack**: React Native (Expo).
+   - **Features**: Offline-first mobile banking application using `AsyncStorage`. Shows cached balances when the network or Gateway is down.
+
 ---
 
 ## 🚀 How to Run the Project Locally
 
-To run the entire PhoenixBank suite locally, you will need **Docker** installed and 3 separate terminal instances.
+To run the entire PhoenixBank suite locally, you will need **Docker** installed and 4 separate terminal instances.
 
 ### 1. Start the Infrastructure (Docker)
-Ensure your Docker daemon is running, then start the databases and Kafka broker:
+Ensure your Docker daemon is running. This starts Postgres, Redis, Zookeeper, Kafka, and the **Kong API Gateway**:
 ```bash
 docker compose up -d
 ```
+*(Kong will run on `http://localhost:8000` and act as the single entry point)*
 
 ### 2. Start the Accounts Ledger (Terminal 1)
 This service connects to Postgres and listens to Kafka events on Port 4001.
@@ -58,20 +67,29 @@ npm run start:dev
 ```
 
 ### 4. Start the Frontend Dashboard (Terminal 3)
-The Next.js frontend runs on Port 4002.
+The Next.js frontend runs on Port 4002 and connects via Kong API Gateway.
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+Navigate to [http://localhost:4002](http://localhost:4002) in your browser.
 
-Navigate to [http://localhost:4002](http://localhost:4002) in your browser to view the PhoenixBank Dashboard!
+### 5. Start the Mobile App (Terminal 4)
+The React Native mobile app features offline caching.
+```bash
+cd mobile
+npm install
+npm start
+```
+Press `w` in the terminal to view in your web browser, or scan the QR code with the **Expo Go** app on your phone (Remember to update `localhost` in `App.js` to your PC's IP address if using a physical phone).
 
 ---
 
 ## 🔮 Roadmap
 
-- **Phase 4**: Implement Kong API Gateway and Istio Service Mesh (mTLS).
-- **Phase 5**: Build offline-first React Native mobile app & USSD gateway.
-- **Phase 6**: Deploy Python AI/ML Anomaly & Fraud Detection Engine.
-- **Phase 7**: Master Key Ceremony & HashiCorp Vault Integration.
+- **✅ Phase 1 - 3**: Accounts, Next.js Frontend, Payments Microservice (Kafka)
+- **✅ Phase 4**: Kong API Gateway & Zero-Trust Routing.
+- **✅ Phase 5**: Offline-first React Native mobile app.
+- **⏳ Phase 6**: Deploy Python AI/ML Anomaly & Fraud Detection Engine.
+- **⏳ Phase 7**: Master Key Ceremony & HashiCorp Vault Integration.
