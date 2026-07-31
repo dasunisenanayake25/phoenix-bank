@@ -1,5 +1,5 @@
 {
-  "name": "accounts-ledger",
+  "name": "payments",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -21,17 +21,12 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.1.28",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/typeorm": "^11.0.3",
-    "dotenv": "^17.4.2",
     "kafkajs": "^2.2.4",
-    "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "typeorm": "^1.1.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
