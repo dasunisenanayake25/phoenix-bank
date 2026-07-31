@@ -1,0 +1,25 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: accounts-service
+    url: http://host.docker.internal:4001/accounts
+    routes:
+      - name: accounts-route
+        paths:
+          - /api/accounts
+        strip_path: true
+
+  - name: payments-service
+    url: http://host.docker.internal:4003/payments
+    routes:
+      - name: payments-route
+        paths:
+          - /api/payments
+        strip_path: true
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 20
+      policy: local

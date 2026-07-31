@@ -12,12 +12,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // We are fetching from the NestJS accounts-ledger microservice running on port 4001
+  // We are fetching from the Kong API Gateway running on port 8000
   // ID '1' is used here as a placeholder for the logged-in user's account ID.
   useEffect(() => {
-    fetch("http://localhost:4001/accounts/1/balance")
+    fetch("http://localhost:8000/api/accounts/1/balance")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch balance. Ensure backend is running and account exists.");
+        if (!res.ok) {
+          if (res.status === 429) throw new Error("Rate limit exceeded! (Blocked by Kong Gateway)");
+          throw new Error("Failed to fetch balance. Ensure backend is running and account exists.");
+        }
         return res.json();
       })
       .then((data) => {
