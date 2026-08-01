@@ -1,9 +1,9 @@
-# PhoenixBank 🏛️ 
+# PhoenixBank 
 **Zero-Trust Banking Architecture & AI Fraud Engine**
 
 PhoenixBank is an enterprise-grade, event-driven banking platform designed for modern security and scalability. Built as a submission for a **DevOps & Security Competition**, this project demonstrates a highly robust microservices architecture leveraging Apache Kafka, HashiCorp Vault, and Machine Learning.
 
-## 🚀 Key Features
+##  Key Features
 
 * **Zero-Trust Security & Key Management**
   * Advanced key management utilizing **Shamir's Secret Sharing (3-of-5 threshold)** via HashiCorp Vault.
@@ -27,7 +27,7 @@ PhoenixBank is an enterprise-grade, event-driven banking platform designed for m
   * Responsive Web App (Next.js) and Mobile App (React Native/Expo).
   * "PROSPERUM" inspired Dark Blue & Gold premium corporate UI.
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Domain | Technologies |
 | :--- | :--- |
@@ -38,7 +38,7 @@ PhoenixBank is an enterprise-grade, event-driven banking platform designed for m
 | **DevOps & Infra** | Docker, Docker Compose, GitHub Actions |
 | **Security & Bus** | HashiCorp Vault, Apache Kafka, Zookeeper, Kong |
 
-## ⚙️ Getting Started
+##  Getting Started
 
 ### 1. Start the Infrastructure (Docker)
 The entire infrastructure (Kafka, Zookeeper, Postgres, Redis, Vault, Kong, and the AI Fraud Engine) is dockerized.
@@ -69,7 +69,7 @@ npx expo start
 ```
 Use the Expo Go app on your phone or an emulator to scan the QR code.
 
-### 5. Demo Accounts 🔑
+### 5. Demo Accounts 
 For testing and evaluation purposes, you can use the following default demo credentials to log in:
 - **Account ID / Email**: `1`
 - **Password**: `123`
@@ -77,4 +77,4 @@ For testing and evaluation purposes, you can use the following default demo cred
 *(Note: In a production environment, strict password policies and multi-factor authentication are enforced).*
 
 ---
-*Built with ❤️ for the DevOps Competition.*
+*Built by Team Neural Ninjas for the DevOps Competition.*
