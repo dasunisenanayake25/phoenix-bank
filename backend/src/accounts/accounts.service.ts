@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, OnModuleInit, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
@@ -21,6 +21,7 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-user-100',
             holderName: 'User',
             email: 'user@phoenixbank.com',
+            password: '123',
             balance: 150000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -31,6 +32,7 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-amila-101',
             holderName: 'Amila',
             email: 'amila@phoenixbank.com',
+            password: '123',
             balance: 50000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -41,13 +43,14 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-kamal-102',
             holderName: 'Kamal',
             email: 'kamal@phoenixbank.com',
+            password: '123',
             balance: 75000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,
           },
         ]);
-        console.log('Initial accounts (1, 2, 3) seeded successfully!');
+        console.log('Initial accounts (1, 2, 3) seeded successfully with default passwords!');
       }
     } catch (err) {
       console.error('Failed to seed initial accounts:', err);
@@ -66,12 +69,11 @@ export class AccountsService implements OnModuleInit {
     return this.accountsRepository.find({ order: { id: 'ASC' } });
   }
 
-  async registerAccount(data: { name: string; email: string; initialDeposit: number; currency?: string }): Promise<Account> {
+  async registerAccount(data: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }): Promise<Account> {
     if (!data.name || data.initialDeposit == null) {
       throw new BadRequestException('Name and initial deposit are required.');
     }
 
-    // Generate unique numeric string ID (e.g. 1001, 1002...)
     const count = await this.accountsRepository.count();
     const nextId = (count + 1000).toString();
 
@@ -80,6 +82,7 @@ export class AccountsService implements OnModuleInit {
       customerId: `cust-${Date.now()}`,
       holderName: data.name,
       email: data.email || `${data.name.toLowerCase().replace(/\s+/g, '')}@phoenixbank.com`,
+      password: data.password || '123',
       balance: Number(data.initialDeposit),
       currency: data.currency || 'LKR',
       accountType: AccountType.SAVINGS,
@@ -87,12 +90,11 @@ export class AccountsService implements OnModuleInit {
     });
 
     const saved = await this.accountsRepository.save(newAccount);
-    console.log('New member registered:', saved);
+    console.log('New member registered with password:', saved.holderName);
     return saved;
   }
 
-  async loginAccount(identifier: string): Promise<Account> {
-    // Search by ID or Email
+  async loginAccount(identifier: string, password?: string): Promise<Account> {
     const account = await this.accountsRepository.findOne({
       where: [
         { id: identifier },
@@ -102,8 +104,14 @@ export class AccountsService implements OnModuleInit {
     });
 
     if (!account) {
-      throw new NotFoundException(`No account found matching identifier '${identifier}'`);
+      throw new NotFoundException(`No account found matching '${identifier}'`);
     }
+
+    // Verify password if provided
+    if (password && account.password && account.password !== password) {
+      throw new UnauthorizedException('Incorrect password. Please try again.');
+    }
+
     return account;
   }
 

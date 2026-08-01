@@ -26,6 +26,9 @@ export class Account {
   @Column({ type: 'varchar', length: 120, nullable: true })
   email: string;
 
+  @Column({ type: 'varchar', length: 255, default: '123456' })
+  password: string;
+
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
   balance: number;
 
