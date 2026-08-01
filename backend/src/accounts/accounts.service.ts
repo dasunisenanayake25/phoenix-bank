@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
@@ -19,6 +19,8 @@ export class AccountsService implements OnModuleInit {
           {
             id: '1',
             customerId: 'cust-user-100',
+            holderName: 'User',
+            email: 'user@phoenixbank.com',
             balance: 150000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -27,6 +29,8 @@ export class AccountsService implements OnModuleInit {
           {
             id: '2',
             customerId: 'cust-amila-101',
+            holderName: 'Amila',
+            email: 'amila@phoenixbank.com',
             balance: 50000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -35,6 +39,8 @@ export class AccountsService implements OnModuleInit {
           {
             id: '3',
             customerId: 'cust-kamal-102',
+            holderName: 'Kamal',
+            email: 'kamal@phoenixbank.com',
             balance: 75000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -48,12 +54,57 @@ export class AccountsService implements OnModuleInit {
     }
   }
 
-  async getBalance(id: string): Promise<{ balance: number; currency: string }> {
+  async getBalance(id: string): Promise<Account> {
     const account = await this.accountsRepository.findOne({ where: { id } });
     if (!account) {
       throw new NotFoundException(`Account with ID ${id} not found`);
     }
-    return { balance: Number(account.balance), currency: account.currency };
+    return account;
+  }
+
+  async getAllAccounts(): Promise<Account[]> {
+    return this.accountsRepository.find({ order: { id: 'ASC' } });
+  }
+
+  async registerAccount(data: { name: string; email: string; initialDeposit: number; currency?: string }): Promise<Account> {
+    if (!data.name || data.initialDeposit == null) {
+      throw new BadRequestException('Name and initial deposit are required.');
+    }
+
+    // Generate unique numeric string ID (e.g. 1001, 1002...)
+    const count = await this.accountsRepository.count();
+    const nextId = (count + 1000).toString();
+
+    const newAccount = this.accountsRepository.create({
+      id: nextId,
+      customerId: `cust-${Date.now()}`,
+      holderName: data.name,
+      email: data.email || `${data.name.toLowerCase().replace(/\s+/g, '')}@phoenixbank.com`,
+      balance: Number(data.initialDeposit),
+      currency: data.currency || 'LKR',
+      accountType: AccountType.SAVINGS,
+      status: AccountStatus.ACTIVE,
+    });
+
+    const saved = await this.accountsRepository.save(newAccount);
+    console.log('New member registered:', saved);
+    return saved;
+  }
+
+  async loginAccount(identifier: string): Promise<Account> {
+    // Search by ID or Email
+    const account = await this.accountsRepository.findOne({
+      where: [
+        { id: identifier },
+        { email: identifier },
+        { holderName: identifier }
+      ]
+    });
+
+    if (!account) {
+      throw new NotFoundException(`No account found matching identifier '${identifier}'`);
+    }
+    return account;
   }
 
   async processTransfer(data: { fromAccountId: string; toAccountId: string; amount: number }) {
@@ -68,7 +119,7 @@ export class AccountsService implements OnModuleInit {
         toAccount.balance = Number(toAccount.balance) + data.amount;
         
         await this.accountsRepository.save([fromAccount, toAccount]);
-        console.log(`Transfer of ${data.amount} successful! New balance for account 1: ${fromAccount.balance}`);
+        console.log(`Transfer of ${data.amount} successful!`);
       } else {
         console.error('Insufficient funds for transfer');
       }

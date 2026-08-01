@@ -20,6 +20,12 @@ export class Account {
   @Column({ name: 'customer_id', type: 'varchar', length: 64, nullable: true })
   customerId: string;
 
+  @Column({ name: 'holder_name', type: 'varchar', length: 120, default: 'User' })
+  holderName: string;
+
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  email: string;
+
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
   balance: number;
 
