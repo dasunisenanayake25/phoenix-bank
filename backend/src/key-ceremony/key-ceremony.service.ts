@@ -30,7 +30,7 @@ export class KeyCeremonyService {
       // MOCK: Simulate signing a batch of pending audit ledger entries
       // -------------------------------------------------------------
       const signedEntries = 12; // Example static count for demo
-      const signatures = [];
+      const signatures: string[] = [];
       for (let i = 0; i < signedEntries; i++) {
         // Just mock some signature strings for demo purposes, 
         // normally we would use crypto.sign with reconstructedKey
