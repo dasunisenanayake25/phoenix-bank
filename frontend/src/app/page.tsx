@@ -36,6 +36,7 @@ export default function Home() {
 
   const [authMsg, setAuthMsg] = useState<string | null>(null);
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Modal states
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -200,65 +201,126 @@ export default function Home() {
     }
   };
 
-  // Auth Screen
+  // Landing Page & Auth
   if (!currentUser) {
     return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1>PhoenixBank</h1>
-            <p>Zero-Trust Mobile Banking</p>
+      <div className="lp-container">
+        {/* Navigation */}
+        <nav className="lp-navbar">
+          <div className="lp-logo">PHOENIXBANK</div>
+          <div className="lp-nav-links">
+            <a href="#">Architecture</a>
+            <a href="#">Security</a>
+            <a href="#">DevOps</a>
+            <a href="#">Insights</a>
           </div>
+          <button className="lp-login-btn" onClick={() => setShowAuthModal(true)}>
+            Schedule Consultation
+          </button>
+        </nav>
 
-          <div className="auth-tabs">
-            <div className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => setAuthTab('login')}>Login</div>
-            <div className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => setAuthTab('register')}>Register</div>
+        {/* Hero Section */}
+        <section className="lp-hero">
+          <div className="lp-hero-content">
+            <h1 className="lp-hero-title">Achieve Financial Success & Security</h1>
+            <p className="lp-hero-desc">
+              Experience the next generation of banking with our Zero-Trust architecture. 
+              Powered by event-driven microservices (Kafka), HashiCorp Vault threshold cryptography, 
+              and real-time AI Fraud Detection.
+            </p>
+            <button className="lp-hero-btn" onClick={() => setShowAuthModal(true)}>
+              Open Account
+            </button>
           </div>
+        </section>
 
-          {authMsg && (
-            <div style={{ padding: '10px', background: '#ffe4e6', color: '#e11d48', borderRadius: '8px', marginBottom: '15px', fontSize: '13px' }}>
-              {authMsg}
+        {/* Features / Services */}
+        <section className="lp-services">
+          <div className="lp-card">
+            <div className="lp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
             </div>
-          )}
+            <h3 className="lp-card-title">Microservices</h3>
+            <p className="lp-card-desc">Event-driven architecture using Kafka for high-throughput, decoupled inter-service communication and eventual consistency.</p>
+          </div>
+          <div className="lp-card">
+            <div className="lp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <h3 className="lp-card-title">AI Fraud Detection</h3>
+            <p className="lp-card-desc">Real-time anomaly detection using scikit-learn Isolation Forests, instantly flagging suspicious transactions {">"} LKR 200,000.</p>
+          </div>
+          <div className="lp-card">
+            <div className="lp-card-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 className="lp-card-title">Zero-Trust Vault</h3>
+            <p className="lp-card-desc">Advanced key management featuring Shamir's Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault dynamic provisioning.</p>
+          </div>
+        </section>
 
-          {authTab === 'login' ? (
-            <form onSubmit={handleLogin}>
-              <div className="form-group">
-                <label>Account ID or Email</label>
-                <input type="text" value={loginIdentifier} onChange={e => setLoginIdentifier(e.target.value)} required />
+        {/* Auth Modal Overlay */}
+        {showAuthModal && (
+          <div className="auth-modal-overlay">
+            <div className="auth-card">
+              <button className="auth-close" onClick={() => setShowAuthModal(false)}>✕</button>
+              
+              <div className="auth-header">
+                <h1>PhoenixBank</h1>
+                <p>Zero-Trust Security Gateway</p>
               </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required />
+
+              <div className="auth-tabs">
+                <div className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => setAuthTab('login')}>Login</div>
+                <div className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => setAuthTab('register')}>Register</div>
               </div>
-              <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
-                {isSubmittingAuth ? "Logging in..." : "Login securely"}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleRegister}>
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" value={regName} onChange={e => setRegName(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label>Email Address</label>
-                <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label>Confirm Password</label>
-                <input type="password" value={regConfirmPassword} onChange={e => setRegConfirmPassword(e.target.value)} required />
-              </div>
-              <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
-                {isSubmittingAuth ? "Registering..." : "Open Account"}
-              </button>
-            </form>
-          )}
-        </div>
+
+              {authMsg && (
+                <div style={{ padding: '10px', background: '#ffe4e6', color: '#e11d48', borderRadius: '8px', marginBottom: '15px', fontSize: '13px' }}>
+                  {authMsg}
+                </div>
+              )}
+
+              {authTab === 'login' ? (
+                <form onSubmit={handleLogin}>
+                  <div className="form-group">
+                    <label>Account ID or Email</label>
+                    <input type="text" value={loginIdentifier} onChange={e => setLoginIdentifier(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required />
+                  </div>
+                  <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
+                    {isSubmittingAuth ? "Authenticating..." : "Login securely"}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleRegister}>
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input type="text" value={regName} onChange={e => setRegName(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" value={regConfirmPassword} onChange={e => setRegConfirmPassword(e.target.value)} required />
+                  </div>
+                  <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
+                    {isSubmittingAuth ? "Registering..." : "Open Account"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
