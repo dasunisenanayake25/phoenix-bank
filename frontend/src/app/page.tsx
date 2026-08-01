@@ -33,7 +33,6 @@ export default function Home() {
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regConfirmPassword, setRegConfirmPassword] = useState("");
-  const [regDeposit, setRegDeposit] = useState("25000");
 
   const [authMsg, setAuthMsg] = useState<string | null>(null);
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
@@ -42,19 +41,19 @@ export default function Home() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showBillsModal, setShowBillsModal] = useState(false);
   const [showCardsModal, setShowCardsModal] = useState(false);
-  const [showLoanModal, setShowLoanModal] = useState(false);
 
   // Transfer Form state
-  const [recipient, setRecipient] = useState("2");
-  const [recipientName, setRecipientName] = useState("Amila");
-  const [amount, setAmount] = useState("5000");
+  const [recipient, setRecipient] = useState("");
+  const [recipientName, setRecipientName] = useState("");
+  const [amount, setAmount] = useState("");
   const [isTransferring, setIsTransferring] = useState(false);
-  const [transferMsg, setTransferMsg] = useState<string | null>(null);
 
-  // Contacts
+  // Favorites
   const [savedContacts, setSavedContacts] = useState<{ id: string; name: string }[]>([
     { id: "2", name: "Amila" },
     { id: "3", name: "Kamal" },
+    { id: "4", name: "Nimal" },
+    { id: "5", name: "Saman" }
   ]);
 
   // Transactions list
@@ -64,7 +63,6 @@ export default function Home() {
     { id: "3", title: "Electricity Bill", time: "28 Jul, 10:15 AM", amount: 5200, type: "expense" },
   ]);
 
-  // Load user session on startup
   useEffect(() => {
     const savedUser = localStorage.getItem("@phoenix_session_user");
     if (savedUser) {
@@ -80,13 +78,9 @@ export default function Home() {
 
   const fetchLatestBalance = (accId: string) => {
     setLoading(true);
-    setError(null);
     fetch(`http://localhost:8000/api/accounts/${accId}/balance`)
       .then((res) => {
-        if (!res.ok) {
-          if (res.status === 429) throw new Error("Rate limit exceeded! (Blocked by Kong Gateway)");
-          throw new Error("Failed to fetch balance. Ensure backend is running.");
-        }
+        if (!res.ok) throw new Error("Failed to fetch balance.");
         return res.json();
       })
       .then((data) => {
@@ -118,16 +112,13 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier: loginIdentifier, password: loginPassword }),
       });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Account not found or password incorrect.");
-      }
+      if (!res.ok) throw new Error("Account not found or password incorrect.");
       const data = await res.json();
       setCurrentUser(data);
       localStorage.setItem("@phoenix_session_user", JSON.stringify(data));
       setAuthMsg("Login successful!");
     } catch (err: any) {
-      setAuthMsg(`Login Error: ${err.message}`);
+      setAuthMsg(err.message);
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -139,13 +130,7 @@ export default function Home() {
     setAuthMsg(null);
 
     if (regPassword !== regConfirmPassword) {
-      setAuthMsg("Registration Error: Passwords do not match! Please verify.");
-      setIsSubmittingAuth(false);
-      return;
-    }
-
-    if (regPassword.length < 3) {
-      setAuthMsg("Registration Error: Password must be at least 3 characters long.");
+      setAuthMsg("Passwords do not match!");
       setIsSubmittingAuth(false);
       return;
     }
@@ -161,15 +146,12 @@ export default function Home() {
           currency: "LKR",
         }),
       });
-      if (!res.ok) {
-        throw new Error("Registration failed. Backend error.");
-      }
+      if (!res.ok) throw new Error("Registration failed.");
       const newAcc = await res.json();
       setCurrentUser(newAcc);
       localStorage.setItem("@phoenix_session_user", JSON.stringify(newAcc));
-      setAuthMsg("Registration successful! Account created.");
     } catch (err: any) {
-      setAuthMsg(`Registration Error: ${err.message}`);
+      setAuthMsg(err.message);
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -180,188 +162,99 @@ export default function Home() {
     localStorage.removeItem("@phoenix_session_user");
   };
 
-  const handleQuickTransferClick = (accId: string, name: string) => {
-    setRecipient(accId);
-    setRecipientName(name);
-    setShowTransferModal(true);
-  };
-
   const handleSendMoney = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
     setIsTransferring(true);
-    setTransferMsg(null);
-
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
-      setTransferMsg("Please enter a valid transfer amount.");
-      setIsTransferring(false);
-      return;
-    }
 
     try {
-      const response = await fetch("http://localhost:8000/api/payments/transfer", {
+      const res = await fetch("http://localhost:8000/api/payments/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fromAccountId: currentUser.id,
           toAccountId: recipient,
-          amount: numAmount,
+          amount: parseFloat(amount),
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Transfer failed. Please check network/Kong gateway.");
-      }
+      if (!res.ok) throw new Error("Transfer request failed");
 
-      setTransferMsg("Transfer initiated successfully via Kafka!");
-      
-      const newTx: Transaction = {
+      setTransactions([{
         id: Date.now().toString(),
-        title: `Transfer to ${recipientName || 'Account ' + recipient}`,
+        title: `Transfer to ${recipientName || recipient}`,
         time: "Just now",
-        amount: numAmount,
-        type: "expense",
-      };
-      setTransactions((prev) => [newTx, ...prev]);
+        amount: parseFloat(amount),
+        type: "expense"
+      }, ...transactions]);
 
-      setTimeout(() => {
-        fetchLatestBalance(currentUser.id);
-        setIsTransferring(false);
-        setTimeout(() => setShowTransferModal(false), 1500);
-      }, 1000);
+      setTimeout(() => fetchLatestBalance(currentUser.id), 1000);
+      setShowTransferModal(false);
+      setAmount("");
+      setRecipient("");
+      alert("Transfer Initiated Successfully");
     } catch (err: any) {
-      setTransferMsg(`Error: ${err.message}`);
+      alert("Error: " + err.message);
+    } finally {
       setIsTransferring(false);
     }
   };
 
-  // --- Render Authentication Screen if no user logged in ---
+  // Auth Screen
   if (!currentUser) {
     return (
-      <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div className="card" style={{ width: "100%", maxWidth: "480px", padding: "2.5rem" }}>
-          <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-            <h2 style={{ color: "var(--primary)", fontSize: "1.8rem", fontWeight: "bold" }}>PhoenixBank</h2>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Zero-Trust Resilient Digital Banking</p>
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h1>PhoenixBank</h1>
+            <p>Zero-Trust Mobile Banking</p>
           </div>
 
-          <div style={{ display: "flex", borderBottom: "2px solid var(--border)", marginBottom: "1.5rem" }}>
-            <button
-              onClick={() => { setAuthTab("login"); setAuthMsg(null); }}
-              style={{
-                flex: 1,
-                padding: "0.75rem",
-                background: "none",
-                border: "none",
-                borderBottom: authTab === "login" ? "3px solid var(--primary)" : "none",
-                fontWeight: "bold",
-                color: authTab === "login" ? "var(--primary)" : "var(--text-muted)",
-                cursor: "pointer",
-              }}
-            >
-              Member Login
-            </button>
-            <button
-              onClick={() => { setAuthTab("register"); setAuthMsg(null); }}
-              style={{
-                flex: 1,
-                padding: "0.75rem",
-                background: "none",
-                border: "none",
-                borderBottom: authTab === "register" ? "3px solid var(--primary)" : "none",
-                fontWeight: "bold",
-                color: authTab === "register" ? "var(--primary)" : "var(--text-muted)",
-                cursor: "pointer",
-              }}
-            >
-              Register New Member
-            </button>
+          <div className="auth-tabs">
+            <div className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => setAuthTab('login')}>Login</div>
+            <div className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => setAuthTab('register')}>Register</div>
           </div>
 
           {authMsg && (
-            <div style={{ padding: "0.75rem", borderRadius: "8px", background: authMsg.includes("Error") ? "#fff5f5" : "#e6fcf5", color: authMsg.includes("Error") ? "#c92a2a" : "#0ca678", fontSize: "0.85rem", marginBottom: "1rem" }}>
+            <div style={{ padding: '10px', background: '#ffe4e6', color: '#e11d48', borderRadius: '8px', marginBottom: '15px', fontSize: '13px' }}>
               {authMsg}
             </div>
           )}
 
-          {authTab === "login" ? (
+          {authTab === 'login' ? (
             <form onSubmit={handleLogin}>
               <div className="form-group">
-                <label>Account ID / Member Email</label>
-                <input
-                  type="text"
-                  value={loginIdentifier}
-                  onChange={(e) => setLoginIdentifier(e.target.value)}
-                  placeholder="Enter Account ID (e.g. 1, 2, 3) or Email"
-                  required
-                />
+                <label>Account ID or Email</label>
+                <input type="text" value={loginIdentifier} onChange={e => setLoginIdentifier(e.target.value)} required />
               </div>
-
               <div className="form-group">
                 <label>Password</label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="Enter password"
-                  required
-                />
+                <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} required />
               </div>
-
               <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
-                {isSubmittingAuth ? "Authenticating..." : "Login to Account"}
+                {isSubmittingAuth ? "Logging in..." : "Login securely"}
               </button>
             </form>
           ) : (
             <form onSubmit={handleRegister}>
               <div className="form-group">
                 <label>Full Name</label>
-                <input
-                  type="text"
-                  value={regName}
-                  onChange={(e) => setRegName(e.target.value)}
-                  placeholder="e.g. Nimal Perera"
-                  required
-                />
+                <input type="text" value={regName} onChange={e => setRegName(e.target.value)} required />
               </div>
-
               <div className="form-group">
                 <label>Email Address</label>
-                <input
-                  type="email"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  placeholder="e.g. nimal@gmail.com"
-                  required
-                />
+                <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} required />
               </div>
-
               <div className="form-group">
                 <label>Password</label>
-                <input
-                  type="password"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  placeholder="Enter secure password"
-                  required
-                />
+                <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} required />
               </div>
-
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input
-                  type="password"
-                  value={regConfirmPassword}
-                  onChange={(e) => setRegConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  required
-                />
+                <input type="password" value={regConfirmPassword} onChange={e => setRegConfirmPassword(e.target.value)} required />
               </div>
-
-
               <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
-                {isSubmittingAuth ? "Creating Account..." : "Create New Member Account"}
+                {isSubmittingAuth ? "Registering..." : "Open Account"}
               </button>
             </form>
           )}
@@ -370,275 +263,164 @@ export default function Home() {
     );
   }
 
-  // --- Main Dashboard Screen for Logged-In User ---
+  // Dashboard Screen
   return (
-    <div>
-      {/* Header User Bar */}
-      <div className="header" style={{ marginBottom: "1.5rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+    <div className="app-container">
+      <header className="header">
+        <div>
           <h1>PhoenixBank</h1>
-          <span style={{ fontSize: "0.8rem", padding: "0.2rem 0.6rem", borderRadius: "12px", background: "#e6fcf5", color: "#0ca678", fontWeight: "bold" }}>
-            Active
-          </span>
+          <p className="user-greeting">Welcome back, {currentUser.holderName}</p>
         </div>
         <div className="header-user">
-          <div>
-            <div style={{ fontWeight: "bold", fontSize: "1rem" }}>Good morning, {currentUser.holderName}</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Acc No: #{currentUser.id}</div>
-          </div>
-          <div className="avatar">
-            {currentUser.holderName ? currentUser.holderName.charAt(0).toUpperCase() : "U"}
-          </div>
-          <button 
-            onClick={handleLogout}
-            style={{
-              background: "#ffe3e3",
-              color: "#c92a2a",
-              border: "none",
-              padding: "0.4rem 0.8rem",
-              borderRadius: "var(--radius)",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: "0.85rem",
-              marginLeft: "0.5rem"
-            }}
-          >
-            Logout
-          </button>
+          <div className="avatar">{currentUser.holderName.charAt(0).toUpperCase()}</div>
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
-      </div>
+      </header>
 
-      <div className="dashboard-grid">
-        <div className="main-content">
-          {error && <div className="error-msg">{error}</div>}
-          
-          {/* Total Balance Card */}
-          <div className="card balance-card">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div className="balance-label">Total Balance</div>
-              <button 
-                onClick={() => fetchLatestBalance(currentUser.id)}
-                style={{
-                  background: "rgba(255,255,255,0.2)",
-                  border: "none",
-                  color: "white",
-                  padding: "0.4rem 0.8rem",
-                  borderRadius: "20px",
-                  cursor: "pointer",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold"
-                }}
-              >
-                Refresh
-              </button>
-            </div>
-            {loading ? (
-              <div className="balance-amount">Loading...</div>
-            ) : (
-              <div className="balance-amount">
-                {currentUser ? `${currentUser.currency} ${currentUser.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : "N/A"}
-              </div>
-            )}
-            <div style={{ marginTop: "1rem", fontSize: "0.85rem", opacity: 0.85 }}>
-              Member: {currentUser.holderName} | Email: {currentUser.email || "N/A"}
-            </div>
+      <main className="dashboard-content">
+        {/* Balance Card */}
+        <div className="balance-card">
+          <div className="balance-label">Total Balance</div>
+          <div className="balance-amount">
+            {currentUser.currency} {currentUser.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
-
-          {/* Quick Action Buttons */}
-          <div className="actions-grid">
-            <div className="action-btn" onClick={() => setShowTransferModal(true)}>
-              Send Money
-            </div>
-            <div className="action-btn" onClick={() => setShowBillsModal(true)}>
-              Pay Bills
-            </div>
-            <div className="action-btn" onClick={() => setShowCardsModal(true)}>
-              Cards
-            </div>
-          </div>
-
-          {/* Recent Activity Section */}
-          <div className="card" style={{ marginTop: "2rem" }}>
-            <h3 className="section-title">Recent Activity</h3>
-            <ul className="transaction-list">
-              {transactions.map((tx) => (
-                <li className="transaction-item" key={tx.id}>
-                  <div className="tx-info">
-                    <h4>{tx.title}</h4>
-                    <p>{tx.time}</p>
-                  </div>
-                  <div className={`tx-amount ${tx.type === "income" ? "positive" : "negative"}`}>
-                    {tx.type === "income" ? "+" : "-"} LKR {tx.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Sidebar Section */}
-        <div className="sidebar">
-          {/* Quick Transfer */}
-          <div className="card">
-            <h3 className="section-title">Quick Transfer</h3>
-            <p style={{ color: "var(--text-muted)", marginBottom: "1rem", fontSize: "0.9rem" }}>
-              Transfer money instantly to saved contacts.
-            </p>
-            <div style={{ display: "flex", gap: "1.2rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
-              {savedContacts.map((contact) => (
-                <div 
-                  key={contact.id}
-                  style={{ textAlign: "center", cursor: "pointer" }}
-                  onClick={() => handleQuickTransferClick(contact.id, contact.name)}
-                >
-                  <div className="avatar" style={{ margin: "0 auto", marginBottom: "0.5rem" }}>
-                    {contact.name.charAt(0)}
-                  </div>
-                  <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{contact.name}</span>
-                </div>
-              ))}
-              <div 
-                style={{ textAlign: "center", cursor: "pointer" }}
-                onClick={() => handleQuickTransferClick("", "")}
-              >
-                <div className="avatar" style={{ margin: "0 auto", marginBottom: "0.5rem", background: "var(--border)", color: "var(--text-main)" }}>+</div>
-                <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>New</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Loans & Offers */}
-          <div className="card" style={{ marginTop: "2rem" }}>
-            <h3 className="section-title">Loans & Offers</h3>
-            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-              You are eligible for an instant personal loan of up to LKR 500,000.
-            </p>
-            <button 
-              onClick={() => setShowLoanModal(true)}
-              style={{
-                background: "var(--primary)",
-                color: "white",
-                border: "none",
-                padding: "0.75rem 1.5rem",
-                borderRadius: "var(--radius)",
-                marginTop: "1rem",
-                width: "100%",
-                cursor: "pointer",
-                fontWeight: "bold"
-              }}
-            >
-              Apply Now
+          <div className="balance-details">
+            <span>Acc: #{currentUser.id}</span>
+            <button className="refresh-btn" onClick={() => fetchLatestBalance(currentUser.id)}>
+              {loading ? "..." : "Refresh"}
             </button>
           </div>
         </div>
 
-        {/* Transfer Modal */}
-        {showTransferModal && (
-          <div className="modal-overlay" onClick={() => setShowTransferModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Send Money (Kafka Event)</h3>
-                <button className="close-btn" onClick={() => setShowTransferModal(false)}>X</button>
-              </div>
-              <form onSubmit={handleSendMoney}>
-                <div className="form-group">
-                  <label>Sender Account (You)</label>
-                  <input type="text" value={`#${currentUser.id} - ${currentUser.holderName}`} disabled />
-                </div>
-                <div className="form-group">
-                  <label>Recipient Account ID</label>
-                  <input
-                    type="text"
-                    value={recipient}
-                    onChange={(e) => setRecipient(e.target.value)}
-                    placeholder="e.g. 2, 3, or new account ID"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Amount (LKR)</label>
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
-                    required
-                  />
-                </div>
-                {transferMsg && (
-                  <div style={{ padding: "0.75rem", borderRadius: "8px", background: transferMsg.includes("Error") ? "#fff5f5" : "#e6fcf5", color: transferMsg.includes("Error") ? "#e03131" : "#0ca678", fontSize: "0.85rem", marginBottom: "1rem" }}>
-                    {transferMsg}
-                  </div>
-                )}
-                <button type="submit" className="submit-btn" disabled={isTransferring}>
-                  {isTransferring ? "Processing Transfer..." : "Confirm & Transfer"}
-                </button>
-              </form>
-            </div>
+        {/* Easy Actions */}
+        <div className="actions-grid">
+          <div className="action-btn" onClick={() => setShowTransferModal(true)}>
+            <div className="action-icon">💸</div>
+            <span className="action-label">Transfer</span>
           </div>
-        )}
-
-        {/* Pay Bills Modal */}
-        {showBillsModal && (
-          <div className="modal-overlay" onClick={() => setShowBillsModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Pay Utility Bills</h3>
-                <button className="close-btn" onClick={() => setShowBillsModal(false)}>X</button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
-                <button className="bill-opt" onClick={() => { alert("Electricity Bill Paid!"); setShowBillsModal(false); }}>CEB Electricity</button>
-                <button className="bill-opt" onClick={() => { alert("Water Bill Paid!"); setShowBillsModal(false); }}>National Water Board</button>
-                <button className="bill-opt" onClick={() => { alert("Telecom Bill Paid!"); setShowBillsModal(false); }}>Dialog / Mobitel Bill</button>
-              </div>
-            </div>
+          <div className="action-btn" onClick={() => setShowBillsModal(true)}>
+            <div className="action-icon">🧾</div>
+            <span className="action-label">Pay Bills</span>
           </div>
-        )}
+          <div className="action-btn">
+            <div className="action-icon">📷</div>
+            <span className="action-label">Scan Pay</span>
+          </div>
+          <div className="action-btn" onClick={() => setShowCardsModal(true)}>
+            <div className="action-icon">💳</div>
+            <span className="action-label">Wallet</span>
+          </div>
+        </div>
 
-        {/* Cards Modal */}
-        {showCardsModal && (
-          <div className="modal-overlay" onClick={() => setShowCardsModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Your PhoenixBank Card</h3>
-                <button className="close-btn" onClick={() => setShowCardsModal(false)}>X</button>
-              </div>
-              <div className="virtual-card">
-                <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>PhoenixBank Debit</div>
-                <div style={{ fontSize: "1.4rem", letterSpacing: "2px", margin: "1.5rem 0" }}>4532 •••• •••• {currentUser.id.padStart(4, '0')}</div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                  <span>HOLDER: {currentUser.holderName.toUpperCase()}</span>
-                  <span>STATUS: ACTIVE</span>
+        {/* Favorite Transfers */}
+        <div className="section-title">
+          <span>Favorite Transfers</span>
+          <span className="section-link">View all</span>
+        </div>
+        <div className="favorites-list">
+          <div className="fav-item" onClick={() => { setRecipient(""); setShowTransferModal(true); }}>
+            <div className="fav-avatar" style={{ background: '#f8fafc', color: '#0056b3', border: '1px dashed #cbd5e1' }}>+</div>
+            <span className="fav-name">Add New</span>
+          </div>
+          {savedContacts.map(contact => (
+            <div key={contact.id} className="fav-item" onClick={() => {
+              setRecipient(contact.id);
+              setRecipientName(contact.name);
+              setShowTransferModal(true);
+            }}>
+              <div className="fav-avatar">{contact.name.charAt(0)}</div>
+              <span className="fav-name">{contact.name}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Transaction History */}
+        <div className="section-title">
+          <span>Recent Activity</span>
+          <span className="section-link">History</span>
+        </div>
+        <div className="transaction-list">
+          {transactions.map(tx => (
+            <div key={tx.id} className="transaction-item">
+              <div className="tx-left">
+                <div className={`tx-icon ${tx.type}`}>
+                  {tx.type === 'income' ? '↓' : '↑'}
                 </div>
+                <div className="tx-info">
+                  <h4>{tx.title}</h4>
+                  <p>{tx.time}</p>
+                </div>
+              </div>
+              <div className={`tx-amount ${tx.type}`}>
+                {tx.type === 'income' ? '+' : '-'} {tx.amount.toLocaleString()}
               </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </main>
 
-        {/* Loan Modal */}
-        {showLoanModal && (
-          <div className="modal-overlay" onClick={() => setShowLoanModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Instant Personal Loan</h3>
-                <button className="close-btn" onClick={() => setShowLoanModal(false)}>X</button>
+      {/* Transfer Modal */}
+      {showTransferModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Fund Transfer</h3>
+              <button className="close-btn" onClick={() => setShowTransferModal(false)}>✕</button>
+            </div>
+            <form onSubmit={handleSendMoney}>
+              <div className="form-group">
+                <label>Recipient Account ID</label>
+                <input type="text" value={recipient} onChange={e => setRecipient(e.target.value)} required />
               </div>
-              <p style={{ margin: "1rem 0", fontSize: "0.95rem" }}>
-                Pre-approved loan up to <strong>LKR 500,000.00</strong> at a promotional rate of 9.5% p.a.
-              </p>
-              <button 
-                className="submit-btn" 
-                onClick={() => {
-                  alert("Loan application submitted successfully! Our representative will call you shortly.");
-                  setShowLoanModal(false);
-                }}
-              >
-                Accept Pre-Approved Loan
+              <div className="form-group">
+                <label>Amount (LKR)</label>
+                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} required />
+              </div>
+              <button type="submit" className="submit-btn" disabled={isTransferring}>
+                {isTransferring ? "Processing..." : "Transfer Now"}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bills Modal */}
+      {showBillsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Pay Bills</h3>
+              <button className="close-btn" onClick={() => setShowBillsModal(false)}>✕</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button style={{ padding: '15px', borderRadius: '12px', border: '1px solid #e9ecef', background: 'white', textAlign: 'left', fontWeight: 'bold' }}>Electricity Board</button>
+              <button style={{ padding: '15px', borderRadius: '12px', border: '1px solid #e9ecef', background: 'white', textAlign: 'left', fontWeight: 'bold' }}>Water Board</button>
+              <button style={{ padding: '15px', borderRadius: '12px', border: '1px solid #e9ecef', background: 'white', textAlign: 'left', fontWeight: 'bold' }}>Mobile Reload</button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Wallet Modal */}
+      {showCardsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Virtual Wallet</h3>
+              <button className="close-btn" onClick={() => setShowCardsModal(false)}>✕</button>
+            </div>
+            <div style={{ background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)', borderRadius: '20px', padding: '24px', color: 'white' }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold' }}>Phoenix Debit</div>
+              <div style={{ fontSize: '24px', letterSpacing: '4px', margin: '24px 0' }}>4532 **** **** {currentUser.id.padStart(4, '0')}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span>{currentUser.holderName.toUpperCase()}</span>
+                <span>ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
