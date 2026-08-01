@@ -15,7 +15,7 @@ export class AccountResponseDto {
   constructor(partial: Partial<Account>) {
     this.id = partial.id!;
     this.holderName = partial.holderName!;
-    this.balance = partial.balance!;
+    this.balance = Number(partial.balance);
     this.currency = partial.currency!;
     this.accountType = partial.accountType!;
     this.status = partial.status!;

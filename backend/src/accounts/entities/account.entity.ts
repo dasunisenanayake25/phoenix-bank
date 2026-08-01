@@ -23,8 +23,11 @@ export class Account {
   @PrimaryColumn('varchar', { length: 64 })
   id: string;
 
-  @Column({ name: 'customer_id', type: 'varchar', length: 64, nullable: true })
-  customerId: string;
+  @ManyToOne(() => Customer, (customer) => customer.accounts, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'customer_id' })
+  customer: Customer;
 
   @Column({
     name: 'holder_name',

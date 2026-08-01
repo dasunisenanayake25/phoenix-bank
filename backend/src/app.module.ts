@@ -1,16 +1,31 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
 import { IdentityModule } from './identity/identity.module';
+import { CustomersModule } from './customers/customers.module';
+import { TransfersModule } from './transfers/transfers.module';
+import { LedgerModule } from './ledger/ledger.module';
+import { OutboxModule } from './outbox/outbox.module';
+import { HealthController } from './health/health.controller';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { SafeHttpExceptionFilter } from './common/filters/safe-http-exception.filter';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 120,
+      },
+    ]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
@@ -61,15 +76,33 @@ import { IdentityModule } from './identity/identity.module';
           password: dbPassword,
           database: configService.get<string>('DB_NAME', 'phoenix_ledger'),
           autoLoadEntities: true,
-          synchronize: !isProduction, // Hardened: Disable in production!
+          synchronize: !isProduction,
         };
       },
       inject: [ConfigService],
     }),
     AccountsModule,
     IdentityModule,
+    CustomersModule,
+    LedgerModule,
+    TransfersModule,
+    OutboxModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, HealthController],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: SafeHttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+}

@@ -7,7 +7,10 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @Controller('api/v1/me/accounts')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(
+    private readonly accountsService: AccountsService,
+    private readonly transfersService: TransfersService,
+  ) {}
 
   @Get()
   async getMyAccounts() {
