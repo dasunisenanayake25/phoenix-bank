@@ -1,6 +1,16 @@
-import { Controller, Post, Body, Inject, OnModuleInit, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Inject,
+  OnModuleInit,
+  UseGuards,
+  Req,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { AuthGuard } from './auth.guard';
+import type { AuthenticatedRequest } from './auth.guard';
 
 @Controller('payments')
 export class AppController implements OnModuleInit {
@@ -15,13 +25,16 @@ export class AppController implements OnModuleInit {
 
   @UseGuards(AuthGuard)
   @Post('transfer')
-  async transferFunds(
-    @Body() transferDto: { fromAccountId: number; toAccountId: number; amount: number },
-    @Req() req: any,
+  transferFunds(
+    @Body()
+    transferDto: { fromAccountId: number; toAccountId: number; amount: number },
+    @Req() req: AuthenticatedRequest,
   ) {
     // Prevent Broken Object Level Authorization (BOLA)
-    if (req.user.id !== transferDto.fromAccountId.toString()) {
-      throw new ForbiddenException("Forbidden resource: You cannot transfer funds from another user's account.");
+    if (req.user?.id !== transferDto.fromAccountId.toString()) {
+      throw new ForbiddenException(
+        "Forbidden resource: You cannot transfer funds from another user's account.",
+      );
     }
 
     // 1. Validate request
@@ -30,16 +43,19 @@ export class AppController implements OnModuleInit {
     }
 
     // 2. Emit event to Kafka Event Bus
-    this.kafkaClient.emit('transfer-initiated', JSON.stringify({
-      ...transferDto,
-      timestamp: new Date().toISOString(),
-    }));
+    this.kafkaClient.emit(
+      'transfer-initiated',
+      JSON.stringify({
+        ...transferDto,
+        timestamp: new Date().toISOString(),
+      }),
+    );
 
     // 3. Return immediate response (Event-Driven Asynchronous pattern)
     return {
       status: 'pending',
       message: 'Transfer initiated and sent for processing',
-      data: transferDto
+      data: transferDto,
     };
   }
 }
