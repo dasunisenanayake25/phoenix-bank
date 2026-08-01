@@ -457,3 +457,47 @@ body {
   border-bottom: 3px solid var(--primary);
   margin-bottom: -2px;
 }
+
+/* ========================================= */
+/* Responsive Media Queries                  */
+/* ========================================= */
+
+@media (max-width: 480px) {
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .balance-amount {
+    font-size: 28px;
+  }
+  .auth-card {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    max-width: 800px;
+    margin: 40px auto;
+    border-radius: 24px;
+    min-height: calc(100vh - 80px);
+    overflow: hidden;
+  }
+  .actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .balance-card {
+    padding: 32px;
+  }
+  .balance-amount {
+    font-size: 42px;
+  }
+  .dashboard-content {
+    padding: 30px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-container {
+    max-width: 1000px;
+  }
+}
