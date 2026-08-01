@@ -344,19 +344,19 @@ export default function App() {
         {/* Actions Grid */}
         <View style={styles.actionsGrid}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowTransferModal(true)}>
-            <View style={styles.actionIcon}><Text style={styles.emoji}>💸</Text></View>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>Tr</Text></View>
             <Text style={styles.actionBtnText}>Transfer</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowBillsModal(true)}>
-            <View style={styles.actionIcon}><Text style={styles.emoji}>🧾</Text></View>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>Bi</Text></View>
             <Text style={styles.actionBtnText}>Pay Bills</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn}>
-            <View style={styles.actionIcon}><Text style={styles.emoji}>📷</Text></View>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>Sc</Text></View>
             <Text style={styles.actionBtnText}>Scan Pay</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowCardsModal(true)}>
-            <View style={styles.actionIcon}><Text style={styles.emoji}>💳</Text></View>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>Wa</Text></View>
             <Text style={styles.actionBtnText}>Wallet</Text>
           </TouchableOpacity>
         </View>
