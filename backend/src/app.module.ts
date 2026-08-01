@@ -14,32 +14,39 @@ import { IdentityModule } from './identity/identity.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        let dbPassword = configService.get<string>('DB_PASSWORD', 'postgrespassword');
-        
+        let dbPassword = configService.get<string>(
+          'DB_PASSWORD',
+          'postgrespassword',
+        );
+
         // Attempt to load database password dynamically from Vault
         try {
           const vaultUrl = process.env.VAULT_ADDR || 'http://localhost:8200';
           const vaultToken = process.env.VAULT_TOKEN || 'phoenix-master-token';
-          
+
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 1500);
-          
+
           const res = await fetch(`${vaultUrl}/v1/secret/data/phoenix/ledger`, {
             headers: { 'X-Vault-Token': vaultToken },
-            signal: controller.signal
+            signal: controller.signal,
           });
           clearTimeout(timeoutId);
 
           if (res.ok) {
-            const data = await res.json() as any;
+            const data = await res.json();
             const secrets = data?.data?.data || {};
             if (secrets.DB_PASSWORD) {
               dbPassword = secrets.DB_PASSWORD;
-              console.log('Successfully loaded DB_PASSWORD from HashiCorp Vault.');
+              console.log(
+                'Successfully loaded DB_PASSWORD from HashiCorp Vault.',
+              );
             }
           }
-        } catch (err) {
-          console.warn('Vault unavailable or sealed. Using default database password.');
+        } catch {
+          console.warn(
+            'Vault unavailable or sealed. Using default database password.',
+          );
         }
 
         const isProduction = process.env.NODE_ENV === 'production';
