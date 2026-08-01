@@ -119,7 +119,7 @@ def reconstruct_and_unseal(provided_shares_list):
     headers = {"X-Vault-Token": "phoenix-master-token"}
     payload = {
         "data": {
-            "DB_PASSWORD": "Rate2002#@maths",
+            "DB_PASSWORD": "postgrespassword",
             "MASTER_KEY": recovered_key,
             "JWT_SECRET": "phoenix_bank_jwt_secure_key_2065"
         }
