@@ -10,18 +10,20 @@ export class TokenService {
     try {
       const vaultUrl = process.env.VAULT_ADDR || 'http://localhost:8200';
       const vaultToken = process.env.VAULT_TOKEN || 'phoenix-master-token';
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1500);
-      
+
       const res = await fetch(`${vaultUrl}/v1/secret/data/phoenix/ledger`, {
         headers: { 'X-Vault-Token': vaultToken },
-        signal: controller.signal
+        signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
       if (res.ok) {
-        const json = await res.json() as any;
+        const json = (await res.json()) as {
+          data?: { data?: { JWT_SECRET?: string } };
+        };
         const secret = json?.data?.data?.JWT_SECRET;
         if (secret) {
           this.jwtSecret = secret;
@@ -29,42 +31,53 @@ export class TokenService {
           return this.jwtSecret;
         }
       }
-    } catch (e) {
+    } catch {
       // Ignore and fallback
     }
 
-    this.jwtSecret = process.env.JWT_SECRET || 'phoenix_bank_jwt_secure_key_2065';
+    this.jwtSecret =
+      process.env.JWT_SECRET || 'phoenix_bank_jwt_secure_key_2065';
     return this.jwtSecret;
   }
 
-  static async generateToken(payload: { id: string; name: string }): Promise<string> {
+  static async generateToken(payload: {
+    id: string;
+    name: string;
+  }): Promise<string> {
     const secret = await this.getSecret();
-    const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+    const header = Buffer.from(
+      JSON.stringify({ alg: 'HS256', typ: 'JWT' }),
+    ).toString('base64url');
     const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
-    
+
     const signature = crypto
       .createHmac('sha256', secret)
       .update(`${header}.${data}`)
       .digest('base64url');
-      
+
     return `${header}.${data}.${signature}`;
   }
 
-  static async verifyToken(token: string): Promise<{ id: string; name: string } | null> {
+  static async verifyToken(
+    token: string,
+  ): Promise<{ id: string; name: string } | null> {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    
+
     const [header, data, signature] = parts;
     const secret = await this.getSecret();
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(`${header}.${data}`)
       .digest('base64url');
-      
+
     if (signature !== expectedSignature) return null;
-    
+
     try {
-      return JSON.parse(Buffer.from(data, 'base64url').toString('utf8'));
+      return JSON.parse(Buffer.from(data, 'base64url').toString('utf8')) as {
+        id: string;
+        name: string;
+      };
     } catch {
       return null;
     }

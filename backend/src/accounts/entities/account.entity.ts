@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',
@@ -20,10 +26,15 @@ export class Account {
   @Column({ name: 'customer_id', type: 'varchar', length: 64, nullable: true })
   customerId: string;
 
-  @Column({ name: 'holder_name', type: 'varchar', length: 120, default: 'User' })
+  @Column({
+    name: 'holder_name',
+    type: 'varchar',
+    length: 120,
+    default: 'User',
+  })
   holderName: string;
 
-  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.0 })
   balance: number;
 
   @Column({ type: 'varchar', length: 3, default: 'LKR' })
@@ -35,7 +46,13 @@ export class Account {
   @Column({ type: 'enum', enum: AccountStatus, default: AccountStatus.ACTIVE })
   status: AccountStatus;
 
-  @Column({ name: 'daily_limit', type: 'decimal', precision: 15, scale: 2, default: 50000.00 })
+  @Column({
+    name: 'daily_limit',
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    default: 50000.0,
+  })
   dailyLimit: number;
 
   @CreateDateColumn({ name: 'created_at' })
