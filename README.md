@@ -1,122 +1,73 @@
-# PhoenixBank
+# PhoenixBank 🏛️ 
+**Zero-Trust Banking Architecture & AI Fraud Engine**
 
-> **A Resilient, Zero-Trust Digital Banking Platform**
+PhoenixBank is an enterprise-grade, event-driven banking platform designed for modern security and scalability. Built as a submission for a **DevOps & Security Competition**, this project demonstrates a highly robust microservices architecture leveraging Apache Kafka, HashiCorp Vault, and Machine Learning.
 
-Rebuilding trusted digital finance with an isolated microservices architecture, AI-powered fraud detection, and threshold cryptography.
+## 🚀 Key Features
 
----
+* **Zero-Trust Security & Key Management**
+  * Advanced key management utilizing **Shamir's Secret Sharing (3-of-5 threshold)** via HashiCorp Vault.
+  * Strict mobile security policies: Biometric Authentication (Fingerprint/FaceID) enforced on all transactions.
+  * OS-level screenshot and screen-recording prevention.
 
-## Architecture Overview
+* **Real-time AI Fraud Detection**
+  * A dedicated Python (FastAPI) microservice running an **Isolation Forest ML Model** (scikit-learn).
+  * Automatically flags anomalies and high-value transactions (> LKR 200,000) for review.
 
-PhoenixBank is built using a **Microservices Architecture** with isolated failure domains, ensuring no single compromised service can cascade into a total network shutdown.
+* **Event-Driven Microservices**
+  * Decoupled backend architecture powered by **Apache Kafka**.
+  * The `transfer-initiated` topic guarantees asynchronous, high-throughput processing between the core ledger and the Fraud Engine.
 
-### Core Components:
+* **API Gateway & DevOps**
+  * Centralized routing using **Kong API Gateway**.
+  * Fully containerized stack orchestrated via **Docker Compose**.
+  * Continuous Integration (CI) pipeline powered by **GitHub Actions**.
 
-1. **Infrastructure (Docker Compose)**
-   - **PostgreSQL**: Isolated ledger database.
-   - **Apache Kafka & Zookeeper**: Asynchronous Event Bus connecting microservices.
-   - **Redis**: Low-latency session state & caching.
-   - **HashiCorp Vault**: Centralized zero-trust secret management.
+* **Premium User Experience**
+  * Responsive Web App (Next.js) and Mobile App (React Native/Expo).
+  * "PROSPERUM" inspired Dark Blue & Gold premium corporate UI.
 
-2. **Frontend Web App (`frontend/`)**
-   - **Tech Stack**: Next.js 15, TypeScript, Vanilla CSS.
-   - **Features**: Glassmorphism UI dashboard, Member Registration & Login Auth, real-time balance updates, interactive transfers, utility bill payments.
+## 🛠️ Technology Stack
 
-3. **Accounts & Ledger Microservice (`backend/`)**
-   - **Tech Stack**: NestJS, TypeORM, PostgreSQL.
-   - **Features**: Account management, member registration, auto-seeding initial ledger states, and Kafka consumer processing transfer events atomically.
+| Domain | Technologies |
+| :--- | :--- |
+| **Frontend (Web)** | React, Next.js, Vanilla CSS |
+| **Mobile App** | React Native, Expo |
+| **Backend Core** | Node.js, NestJS, PostgreSQL, Redis |
+| **AI / Fraud Engine**| Python, FastAPI, scikit-learn, NumPy |
+| **DevOps & Infra** | Docker, Docker Compose, GitHub Actions |
+| **Security & Bus** | HashiCorp Vault, Apache Kafka, Zookeeper, Kong |
 
-4. **Payments Microservice (`payments/`)**
-   - **Tech Stack**: NestJS, Kafka Client.
-   - **Features**: Isolated payment processing microservice. Exposes `POST /payments/transfer`, validates requests, and publishes `transfer-initiated` events to Kafka.
+## ⚙️ Getting Started
 
-5. **AI/ML Fraud & Anomaly Engine (`fraud-detection/`)**
-   - **Tech Stack**: Python, FastAPI, Scikit-Learn (`IsolationForest`), Kafka Consumer.
-   - **Features**: Real-time Machine Learning transaction scoring to detect high-risk anomalies, rapid velocity transfers, and suspicious transaction patterns.
-
-6. **Security & Master Key Ceremony (`security/`)**
-   - **Tech Stack**: Python, HashiCorp Vault REST API.
-   - **Features**: 3-of-5 Shamir's Secret Sharing threshold scheme for splitting the Root Master Key into 5 shares and unsealing Vault KV secrets securely.
-
-7. **API Gateway (`kong/`)**
-   - **Tech Stack**: Kong (DB-less mode).
-   - **Features**: Single entry point for all client requests (`http://localhost:8000`), configured with Rate-Limiting plugin (20 req/min) for DDoS protection.
-
-8. **Mobile App (`mobile/`)**
-   - **Tech Stack**: React Native (Expo).
-   - **Features**: Offline-first mobile banking application using `AsyncStorage` for cached balances during network or gateway outages.
-
----
-
-## Security & Zero-Trust Best Practices
-
-- **Zero-Trust Access**: All client applications route strictly through the Kong API Gateway (`http://localhost:8000`). Direct microservice exposure is blocked in production.
-- **Threshold Cryptography**: Root Master Key is governed by a 3-of-5 Shamir's Secret Sharing scheme (`security/key_ceremony.py`). No single administrator holds full system access.
-- **Environment Confidentiality**: Production database and JWT secrets are managed via HashiCorp Vault. Raw credentials must never be hardcoded or committed to version control.
-
----
-
-## How to Run the Project Locally
-
-### 1. Start Infrastructure (Docker)
-Ensure Docker Desktop is running:
+### 1. Start the Infrastructure (Docker)
+The entire infrastructure (Kafka, Zookeeper, Postgres, Redis, Vault, Kong, and the AI Fraud Engine) is dockerized.
 ```bash
-docker compose up -d
+docker-compose up -d --build
 ```
-*(Starts Postgres, Redis, Zookeeper, Kafka, Kong API Gateway, and HashiCorp Vault)*
 
-### 2. Start the Accounts Ledger (Terminal 1)
+### 2. Start the Backend (Core Ledger)
 ```bash
 cd backend
 npm install
 npm run start:dev
 ```
-*(Runs on Port 4001 and connects to PostgreSQL)*
 
-### 3. Start the Payments Service (Terminal 2)
-```bash
-cd payments
-npm install
-npm run start:dev
-```
-*(Runs on Port 4003 and acts as Kafka Producer)*
-
-### 4. Start the AI/ML Fraud Detection Engine (Terminal 3)
-```bash
-cd fraud-detection
-pip install -r requirements.txt
-python main.py
-```
-*(Runs on Port 5000 and scores transactions in real time)*
-
-### 5. Start the Web Dashboard (Terminal 4)
+### 3. Start the Web Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Navigate to [http://localhost:4002](http://localhost:4002).
+Visit `http://localhost:3000` to view the Web App.
 
-### 6. Start the Mobile App (Terminal 5)
+### 4. Start the Mobile App
 ```bash
 cd mobile
 npm install
-npm start
+npx expo start
 ```
-Press `w` in the terminal to view in browser or scan QR code using **Expo Go**.
-
-### 7. Perform Master Key Ceremony (Security CLI)
-```bash
-python security/key_ceremony.py --generate
-python security/key_ceremony.py --unseal <share1> <share2> <share3>
-```
+Use the Expo Go app on your phone or an emulator to scan the QR code.
 
 ---
-
-## Completed Roadmap
-
-- **Phase 1 - 3 [DONE]**: Accounts, Next.js Frontend, Payments Microservice (Kafka)
-- **Phase 4 [DONE]**: Kong API Gateway & Zero-Trust Rate Limiting
-- **Phase 5 [DONE]**: Offline-first React Native mobile app with AsyncStorage
-- **Phase 6 [DONE]**: Python AI/ML Anomaly & Fraud Detection Engine (IsolationForest)
-- **Phase 7 [DONE]**: Master Key Ceremony (3-of-5 Shamir's Secret Sharing) & HashiCorp Vault Integration
+*Built with ❤️ for the DevOps Competition.*
