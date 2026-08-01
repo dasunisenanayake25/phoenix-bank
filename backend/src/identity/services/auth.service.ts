@@ -55,10 +55,14 @@ export class AuthService {
     return this.loginUser(user);
   }
 
-  private async loginUser(user: { id: string; email: string; role: string }) {
+  private loginUser(user: {
+    id: string;
+    email: string;
+    role: string;
+  }): Promise<{ access_token: string }> {
     const payload = { email: user.email, sub: user.id, role: user.role };
-    return {
+    return Promise.resolve({
       access_token: this.jwtService.sign(payload),
-    };
+    });
   }
 }
