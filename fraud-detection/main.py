@@ -87,7 +87,7 @@ def evaluate_fraud_risk(from_id: str, to_id: str, amount: float) -> Dict[str, An
     }
 
     if is_anomaly:
-        logger.warning(f"🚨 FRAUD ANOMALY DETECTED: Account {from_id} -> {to_id} | Amount: LKR {amount} | Risk: {risk_score}")
+        logger.warning(f"FRAUD ANOMALY DETECTED: Account {from_id} -> {to_id} | Amount: LKR {amount} | Risk: {risk_score}")
         ANOMALY_LOGS.insert(0, result)
         if len(ANOMALY_LOGS) > 100:
             ANOMALY_LOGS.pop()
