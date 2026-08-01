@@ -69,5 +69,12 @@ npx expo start
 ```
 Use the Expo Go app on your phone or an emulator to scan the QR code.
 
+### 5. Demo Accounts 🔑
+For testing and evaluation purposes, you can use the following default demo credentials to log in:
+- **Account ID / Email**: `1`
+- **Password**: `123`
+
+*(Note: In a production environment, strict password policies and multi-factor authentication are enforced).*
+
 ---
 *Built with ❤️ for the DevOps Competition.*
