@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Scan repository with Trivy
-        run: docker run --rm -v "${{ github.workspace }}:/repo" aquasec/trivy:0.58.2 fs --severity CRITICAL --ignore-unfixed --exit-code 1 /repo/backend /repo/payments /repo/frontend /repo/fraud-detection /repo/kong /repo/security /repo/docker-compose.secure.yml /repo/docker-compose.dev.yml
+        run: docker run --rm -v "${{ github.workspace }}:/repo" aquasec/trivy:latest fs --severity CRITICAL --ignore-unfixed --exit-code 1 /repo
 
   node-services:
     name: Node service checks

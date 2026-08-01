@@ -4,10 +4,7 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
 } from 'typeorm';
-import { Customer } from '../../customers/entities/customer.entity';
 
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',
@@ -40,7 +37,7 @@ export class Account {
   })
   holderName: string;
 
-  @Column({ type: 'bigint', default: 0 })
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.0 })
   balance: number;
 
   @Column({ type: 'varchar', length: 3, default: 'LKR' })

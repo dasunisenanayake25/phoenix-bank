@@ -4,6 +4,15 @@ import { BadRequestException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as sss from 'shamirs-secret-sharing';
 
+const splitFn = (
+  sss as unknown as {
+    split: (
+      secret: Buffer,
+      opts: { shares: number; threshold: number },
+    ) => Buffer[];
+  }
+).split;
+
 describe('KeyCeremonyService', () => {
   let service: KeyCeremonyService;
 
@@ -21,21 +30,20 @@ describe('KeyCeremonyService', () => {
 
   it('should successfully reconstruct key and sign with 3 valid shares', () => {
     const masterKey = crypto.randomBytes(32);
-    const shares = sss.split(masterKey, { shares: 5, threshold: 3 });
-    const shareHexes = [
+    const shares = splitFn(masterKey, { shares: 5, threshold: 3 });
+
+    const result = service.reconstructAndSign([
       shares[0].toString('hex'),
       shares[1].toString('hex'),
       shares[2].toString('hex'),
-    ];
-
-    const result = service.reconstructAndSign(shareHexes);
+    ]);
     expect(result.success).toBe(true);
     expect(result.signedEntries).toBe(12);
   });
 
   it('should fail with less than 3 shares', () => {
     const masterKey = crypto.randomBytes(32);
-    const shares = sss.split(masterKey, { shares: 5, threshold: 3 });
+    const shares = splitFn(masterKey, { shares: 5, threshold: 3 });
     const shareHexes = [shares[0].toString('hex'), shares[1].toString('hex')];
 
     expect(() => service.reconstructAndSign(shareHexes)).toThrow(
