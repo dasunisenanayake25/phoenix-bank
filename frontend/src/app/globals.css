@@ -402,23 +402,198 @@ body {
   opacity: 0.7;
 }
 
-/* Auth Pages */
-.auth-container {
+/* ========================================= */
+/* Landing Page (PROSPERUM Style)            */
+/* ========================================= */
+.lp-container {
   min-height: 100vh;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.lp-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 5%;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.lp-logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.lp-nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.lp-nav-links a {
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.lp-nav-links a:hover {
+  color: #fbbf24;
+}
+
+.lp-login-btn {
+  background: #d97706; /* Gold/Mustard */
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lp-login-btn:hover {
+  background: #b45309;
+}
+
+/* Hero Section */
+.lp-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 180px 5% 120px 5%;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 100px;
+  background: linear-gradient(to top, #f8fafc, transparent);
+}
+
+.lp-hero-content {
+  max-width: 800px;
+  position: relative;
+  z-index: 2;
+}
+
+.lp-hero-title {
+  font-size: 56px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  font-family: "Georgia", serif;
+}
+
+.lp-hero-desc {
+  font-size: 18px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 600px;
+}
+
+.lp-hero-btn {
+  background: #d97706;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+/* Services / Features */
+.lp-services {
+  padding: 80px 5%;
+  max-width: 1200px;
+  margin: -100px auto 0 auto;
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.lp-card {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-top: 4px solid #d97706;
+}
+
+.lp-card-icon {
+  width: 50px;
+  height: 50px;
+  background: #f1f5f9;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--background);
-  padding: 20px;
+  font-size: 24px;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.lp-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.lp-card-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Auth Modal (Replacing Auth Container) */
+.auth-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .auth-card {
-  background: var(--surface);
+  background: white;
   border-radius: 24px;
-  padding: 30px;
+  padding: 40px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: var(--shadow-sm);
+  max-width: 420px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.auth-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  font-weight: bold;
+  color: #64748b;
+  cursor: pointer;
 }
 
 .auth-header {
@@ -427,19 +602,19 @@ body {
 }
 
 .auth-header h1 {
-  color: var(--primary);
+  color: #0f172a;
   font-size: 24px;
 }
 
 .auth-header p {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 13px;
+  color: #64748b;
   margin-top: 5px;
 }
 
 .auth-tabs {
   display: flex;
-  border-bottom: 2px solid var(--secondary);
+  border-bottom: 2px solid #e2e8f0;
   margin-bottom: 24px;
 }
 
@@ -448,13 +623,13 @@ body {
   text-align: center;
   padding: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #94a3b8;
   cursor: pointer;
 }
 
 .auth-tab.active {
-  color: var(--primary);
-  border-bottom: 3px solid var(--primary);
+  color: #0f172a;
+  border-bottom: 3px solid #d97706;
   margin-bottom: -2px;
 }
 
