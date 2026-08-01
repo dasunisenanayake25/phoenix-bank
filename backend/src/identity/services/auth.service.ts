@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { RegisterDto, LoginDto } from '../dto/auth.dto';
 import { UserRole } from '../entities/user.entity';
-// Assuming we inject a repository for User here
 
 @Injectable()
 export class AuthService {
@@ -14,9 +13,8 @@ export class AuthService {
 
   constructor(private jwtService: JwtService) {}
 
-  async register(registerDto: RegisterDto): Promise<any> {
-    const passwordHash = await argon2.hash(registerDto.password);
-    void passwordHash;
+  async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
+    await argon2.hash(registerDto.password);
     // 1. Check if user exists
     // 2. Create User entity with hashedPassword
     // 3. Save to DB
@@ -32,7 +30,7 @@ export class AuthService {
     return this.loginUser(user);
   }
 
-  async login(loginDto: LoginDto): Promise<any> {
+  login(loginDto: LoginDto): Promise<{ access_token: string }> {
     // 1. Find user by email
     // 2. If !user or user is locked, throw UnauthorizedException
     // 3. Verify password: await argon2.verify(user.passwordHash, loginDto.password)
@@ -57,10 +55,14 @@ export class AuthService {
     return this.loginUser(user);
   }
 
-  private async loginUser(user: any) {
+  private loginUser(user: {
+    id: string;
+    email: string;
+    role: string;
+  }): Promise<{ access_token: string }> {
     const payload = { email: user.email, sub: user.id, role: user.role };
-    return {
+    return Promise.resolve({
       access_token: this.jwtService.sign(payload),
-    };
+    });
   }
 }

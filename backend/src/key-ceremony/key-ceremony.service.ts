@@ -25,6 +25,7 @@ export class KeyCeremonyService {
       const shareBuffers = sharesHex.map((hex) => Buffer.from(hex, 'hex'));
 
       // Reconstruct the key
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       reconstructedKey = sss.combine(shareBuffers);
 
       // Verify the reconstructed key is valid (assuming it should be 32 bytes)

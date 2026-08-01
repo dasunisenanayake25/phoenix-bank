@@ -34,6 +34,7 @@ import { SafeHttpExceptionFilter } from './common/filters/safe-http-exception.fi
           'postgrespassword',
         );
 
+        // Attempt to load database password dynamically from Vault
         try {
           const vaultUrl = process.env.VAULT_ADDR || 'http://localhost:8200';
           const vaultToken = process.env.VAULT_TOKEN || 'phoenix-master-token';
@@ -51,9 +52,9 @@ import { SafeHttpExceptionFilter } from './common/filters/safe-http-exception.fi
             const data = (await res.json()) as {
               data?: { data?: Record<string, string> };
             };
-            const secrets = data?.data?.data || {};
-            if (secrets.DB_PASSWORD) {
-              dbPassword = secrets.DB_PASSWORD;
+            const secrets = data?.data?.data ?? {};
+            if (secrets['DB_PASSWORD']) {
+              dbPassword = secrets['DB_PASSWORD'];
               console.log(
                 'Successfully loaded DB_PASSWORD from HashiCorp Vault.',
               );
