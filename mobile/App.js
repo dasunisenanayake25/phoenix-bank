@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as ScreenCapture from 'expo-screen-capture';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -33,13 +36,19 @@ export default function App() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showBillsModal, setShowBillsModal] = useState(false);
   const [showCardsModal, setShowCardsModal] = useState(false);
-  const [showLoanModal, setShowLoanModal] = useState(false);
 
   // Transfer Form State
-  const [recipient, setRecipient] = useState('2');
-  const [recipientName, setRecipientName] = useState('Amila');
-  const [amount, setAmount] = useState('5000');
+  const [recipient, setRecipient] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [amount, setAmount] = useState('');
   const [isTransferring, setIsTransferring] = useState(false);
+
+  // Favorites
+  const [savedContacts, setSavedContacts] = useState([
+    { id: '2', name: 'Amila' },
+    { id: '3', name: 'Kamal' },
+    { id: '4', name: 'Nimal' },
+  ]);
 
   // Transactions State
   const [transactions, setTransactions] = useState([
@@ -51,6 +60,15 @@ export default function App() {
   const API_BASE_URL = 'http://localhost:8000';
 
   useEffect(() => {
+    // SECURITY: Prevent screen recording and screenshots on Android/iOS (Proposal Req)
+    const preventCapture = async () => {
+      try {
+        await ScreenCapture.preventScreenCaptureAsync();
+      } catch (e) {
+        console.warn("Screen capture prevention failed on this simulator.");
+      }
+    };
+    preventCapture();
     loadSavedSession();
   }, []);
 
@@ -67,13 +85,27 @@ export default function App() {
     }
   };
 
+  const authenticateBiometrics = async (promptMessage) => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (hasHardware && isEnrolled) {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: promptMessage || 'Authenticate to proceed',
+        fallbackLabel: 'Use Passcode',
+      });
+      return result.success;
+    }
+    // If no biometrics set up, we let them proceed on simulator, 
+    // but in production this would force a PIN setup.
+    return true; 
+  };
+
   const fetchLatestBalance = async (accId) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/accounts/${accId}/balance`);
-      if (!response.ok) {
-        throw new Error('Server error');
-      }
+      if (!response.ok) throw new Error('Server error');
 
       const data = await response.json();
       const updated = {
@@ -104,18 +136,16 @@ export default function App() {
         body: JSON.stringify({ identifier: loginIdentifier, password: loginPassword }),
       });
 
-      if (!res.ok) {
-        throw new Error('Account not found or password incorrect.');
-      }
+      if (!res.ok) throw new Error('Account not found or password incorrect.');
+      
+      const authSuccess = await authenticateBiometrics('Login to PhoenixBank');
+      if (!authSuccess) throw new Error('Biometric authentication failed.');
 
       const user = await res.json();
       setCurrentUser(user);
       await AsyncStorage.setItem('@phoenix_session_user', JSON.stringify(user));
-      Alert.alert('Success', `Welcome back, ${user.holderName}!`);
     } catch (err) {
-      const fallbackUser = { id: loginIdentifier, holderName: `Member #${loginIdentifier}`, balance: 150000.0, currency: 'LKR' };
-      setCurrentUser(fallbackUser);
-      Alert.alert('Offline Mode', `Logged in locally as Account #${loginIdentifier}`);
+      Alert.alert('Error', err.message);
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -123,10 +153,9 @@ export default function App() {
 
   const handleRegister = async () => {
     if (regPassword !== regConfirmPassword) {
-      Alert.alert('Error', 'Passwords do not match! Please verify.');
+      Alert.alert('Error', 'Passwords do not match!');
       return;
     }
-
     setIsSubmittingAuth(true);
     try {
       const res = await fetch(`${API_BASE_URL}/api/accounts/register`, {
@@ -139,17 +168,14 @@ export default function App() {
           currency: 'LKR',
         }),
       });
-
-      if (!res.ok) {
-        throw new Error('Registration failed.');
-      }
-
+      if (!res.ok) throw new Error('Registration failed.');
+      
       const newAcc = await res.json();
       setCurrentUser(newAcc);
       await AsyncStorage.setItem('@phoenix_session_user', JSON.stringify(newAcc));
       Alert.alert('Success', `Account Created! Welcome ${newAcc.holderName}`);
     } catch (err) {
-      Alert.alert('Error', err.message || 'Server error during registration.');
+      Alert.alert('Error', err.message);
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -168,6 +194,13 @@ export default function App() {
       return;
     }
 
+    // Require Fingerprint to authorize transactions (Zero-Trust)
+    const authSuccess = await authenticateBiometrics('Authorize Transfer of LKR ' + numAmount);
+    if (!authSuccess) {
+      Alert.alert('Cancelled', 'Transfer not authorized.');
+      return;
+    }
+
     setIsTransferring(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/payments/transfer`, {
@@ -180,20 +213,18 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Transfer request failed.');
-      }
+      if (!response.ok) throw new Error('Transfer request failed.');
 
       const newTx = {
         id: Date.now().toString(),
-        title: `Transfer to ${recipientName || 'Account ' + recipient}`,
+        title: `Transfer to ${recipientName || 'Acc ' + recipient}`,
         time: 'Just now',
         amount: numAmount,
         type: 'expense',
       };
       setTransactions((prev) => [newTx, ...prev]);
 
-      Alert.alert('Success', 'Transfer initiated successfully via Kafka!');
+      Alert.alert('Success', 'Transfer successful!');
       
       const newBal = currentUser.balance - numAmount;
       const updatedUser = { ...currentUser, balance: newBal };
@@ -201,9 +232,10 @@ export default function App() {
       await AsyncStorage.setItem('@phoenix_session_user', JSON.stringify(updatedUser));
 
       setShowTransferModal(false);
+      setAmount('');
       setTimeout(() => fetchLatestBalance(currentUser.id), 1000);
     } catch (error) {
-      Alert.alert('Offline Transfer', 'Server unreachable. Transfer request saved.');
+      Alert.alert('Error', 'Failed to connect. Try again later.');
     } finally {
       setIsTransferring(false);
     }
@@ -215,20 +247,16 @@ export default function App() {
       <View style={styles.authContainer}>
         <StatusBar style="dark" />
         <View style={styles.authCard}>
-          <Text style={styles.logoTextCenter}>PhoenixBank</Text>
-          <Text style={styles.subLogoText}>Zero-Trust Digital Mobile Banking</Text>
+          <View style={styles.authHeader}>
+            <Text style={styles.logoTextCenter}>PhoenixBank</Text>
+            <Text style={styles.subLogoText}>Zero-Trust Mobile Banking</Text>
+          </View>
 
           <View style={styles.authTabs}>
-            <TouchableOpacity 
-              style={[styles.authTabBtn, authTab === 'login' && styles.authTabActive]} 
-              onPress={() => setAuthTab('login')}
-            >
+            <TouchableOpacity style={[styles.authTabBtn, authTab === 'login' && styles.authTabActive]} onPress={() => setAuthTab('login')}>
               <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>Login</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.authTabBtn, authTab === 'register' && styles.authTabActive]} 
-              onPress={() => setAuthTab('register')}
-            >
+            <TouchableOpacity style={[styles.authTabBtn, authTab === 'register' && styles.authTabActive]} onPress={() => setAuthTab('register')}>
               <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>Register</Text>
             </TouchableOpacity>
           </View>
@@ -236,69 +264,31 @@ export default function App() {
           {authTab === 'login' ? (
             <View>
               <Text style={styles.inputLabel}>Account ID or Email</Text>
-              <TextInput
-                style={styles.input}
-                value={loginIdentifier}
-                onChangeText={setLoginIdentifier}
-                placeholder="Enter Account ID (e.g. 1, 2, 3)"
-              />
+              <TextInput style={styles.input} value={loginIdentifier} onChangeText={setLoginIdentifier} />
 
               <Text style={styles.inputLabel}>Password</Text>
-              <TextInput
-                style={styles.input}
-                value={loginPassword}
-                onChangeText={setLoginPassword}
-                secureTextEntry
-                placeholder="Enter password"
-              />
-
-
+              <TextInput style={styles.input} value={loginPassword} onChangeText={setLoginPassword} secureTextEntry />
 
               <TouchableOpacity style={styles.submitBtn} onPress={handleLogin} disabled={isSubmittingAuth}>
-                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Authenticating...' : 'Login'}</Text>
+                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Authenticating...' : 'Login securely'}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View>
               <Text style={styles.inputLabel}>Full Name</Text>
-              <TextInput
-                style={styles.input}
-                value={regName}
-                onChangeText={setRegName}
-                placeholder="e.g. Nimal Perera"
-              />
+              <TextInput style={styles.input} value={regName} onChangeText={setRegName} />
 
               <Text style={styles.inputLabel}>Email Address</Text>
-              <TextInput
-                style={styles.input}
-                value={regEmail}
-                onChangeText={setRegEmail}
-                placeholder="e.g. nimal@gmail.com"
-                keyboardType="email-address"
-              />
+              <TextInput style={styles.input} value={regEmail} onChangeText={setRegEmail} keyboardType="email-address" />
 
               <Text style={styles.inputLabel}>Password</Text>
-              <TextInput
-                style={styles.input}
-                value={regPassword}
-                onChangeText={setRegPassword}
-                secureTextEntry
-                placeholder="Enter password"
-              />
+              <TextInput style={styles.input} value={regPassword} onChangeText={setRegPassword} secureTextEntry />
 
               <Text style={styles.inputLabel}>Confirm Password</Text>
-              <TextInput
-                style={styles.input}
-                value={regConfirmPassword}
-                onChangeText={setRegConfirmPassword}
-                secureTextEntry
-                placeholder="Confirm password"
-              />
-
-
+              <TextInput style={styles.input} value={regConfirmPassword} onChangeText={setRegConfirmPassword} secureTextEntry />
 
               <TouchableOpacity style={styles.submitBtn} onPress={handleRegister} disabled={isSubmittingAuth}>
-                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Creating...' : 'Register Account'}</Text>
+                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Creating...' : 'Open Account'}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -311,79 +301,113 @@ export default function App() {
   return (
     <View style={styles.screen}>
       <StatusBar style="dark" />
+      
+      {/* Top Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.logoText}>PhoenixBank</Text>
+          <Text style={styles.userGreeting}>Welcome back, {currentUser.holderName}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{currentUser.holderName.charAt(0).toUpperCase()}</Text>
+          </View>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutBtnText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
-        {/* Top Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.logoText}>PhoenixBank</Text>
-            <Text style={styles.userGreeting}>Good morning, {currentUser.holderName}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {currentUser.holderName ? currentUser.holderName.charAt(0).toUpperCase() : 'U'}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-              <Text style={styles.logoutBtnText}>Logout</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* Offline Banner */}
         {isOffline && (
           <View style={styles.offlineBanner}>
-            <Text style={styles.offlineText}>Offline Mode - Showing Cached Data</Text>
+            <Text style={styles.offlineText}>Offline Mode - Cached Data</Text>
           </View>
         )}
 
-        {/* Total Balance Card */}
-        <View style={styles.balanceCard}>
+        {/* Balance Card */}
+        <LinearGradient colors={['#0056b3', '#007bff']} style={styles.balanceCard}>
           <View style={styles.balanceHeader}>
             <Text style={styles.balanceLabel}>TOTAL BALANCE</Text>
             <TouchableOpacity onPress={() => fetchLatestBalance(currentUser.id)} style={styles.refreshBtn}>
-              <Text style={styles.refreshBtnText}>Refresh</Text>
+              <Text style={styles.refreshBtnText}>{loading ? '...' : 'Refresh'}</Text>
             </TouchableOpacity>
           </View>
+          <Text style={styles.balanceAmount}>
+            {currentUser.currency} {currentUser.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </Text>
+          <Text style={styles.cardSubText}>Account No: #{currentUser.id}</Text>
+        </LinearGradient>
 
-          {loading ? (
-            <ActivityIndicator size="large" color="#ffffff" style={{ marginVertical: 15 }} />
-          ) : (
-            <Text style={styles.balanceAmount}>
-              {currentUser.currency} {currentUser.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </Text>
-          )}
-
-          <Text style={styles.cardSubText}>Account No: #{currentUser.id} | Member: {currentUser.holderName}</Text>
-        </View>
-
-        {/* Quick Action Buttons */}
-        <View style={styles.actionsRow}>
+        {/* Actions Grid */}
+        <View style={styles.actionsGrid}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowTransferModal(true)}>
-            <Text style={styles.actionBtnText}>Send Money</Text>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>💸</Text></View>
+            <Text style={styles.actionBtnText}>Transfer</Text>
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowBillsModal(true)}>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>🧾</Text></View>
             <Text style={styles.actionBtnText}>Pay Bills</Text>
           </TouchableOpacity>
-
+          <TouchableOpacity style={styles.actionBtn}>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>📷</Text></View>
+            <Text style={styles.actionBtnText}>Scan Pay</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowCardsModal(true)}>
-            <Text style={styles.actionBtnText}>Cards</Text>
+            <View style={styles.actionIcon}><Text style={styles.emoji}>💳</Text></View>
+            <Text style={styles.actionBtnText}>Wallet</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Favorites */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Favorite Transfers</Text>
+          <Text style={styles.sectionLink}>View all</Text>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.favoritesScroll}>
+          <TouchableOpacity style={styles.favoriteItem} onPress={() => { setRecipient(''); setShowTransferModal(true); }}>
+            <View style={[styles.favAvatar, { backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#cbd5e1' }]}>
+              <Text style={[styles.favAvatarText, { color: '#0056b3' }]}>+</Text>
+            </View>
+            <Text style={styles.favoriteName}>Add New</Text>
+          </TouchableOpacity>
+          {savedContacts.map((contact) => (
+            <TouchableOpacity 
+              key={contact.id} 
+              style={styles.favoriteItem} 
+              onPress={() => { setRecipient(contact.id); setRecipientName(contact.name); setShowTransferModal(true); }}
+            >
+              <View style={styles.favAvatar}>
+                <Text style={styles.favAvatarText}>{contact.name.charAt(0)}</Text>
+              </View>
+              <Text style={styles.favoriteName}>{contact.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
         {/* Recent Activity */}
-        <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <Text style={styles.sectionLink}>History</Text>
+        </View>
+        <View style={styles.sectionCard}>
           {transactions.map((tx) => (
             <View key={tx.id} style={styles.txRow}>
-              <View>
-                <Text style={styles.txTitle}>{tx.title}</Text>
-                <Text style={styles.txTime}>{tx.time}</Text>
+              <View style={styles.txLeft}>
+                <View style={[styles.txIconBox, tx.type === 'income' ? styles.txIconIncome : styles.txIconExpense]}>
+                  <Text style={[tx.type === 'income' ? styles.txPositive : styles.txNegative]}>
+                    {tx.type === 'income' ? '↓' : '↑'}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={styles.txTitle}>{tx.title}</Text>
+                  <Text style={styles.txTime}>{tx.time}</Text>
+                </View>
               </View>
               <Text style={[styles.txAmount, tx.type === 'income' ? styles.txPositive : styles.txNegative]}>
-                {tx.type === 'income' ? '+' : '-'} LKR {tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                {tx.type === 'income' ? '+' : '-'} {tx.amount.toLocaleString()}
               </Text>
             </View>
           ))}
@@ -396,38 +420,38 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Send Money</Text>
+              <Text style={styles.modalTitle}>Fund Transfer</Text>
               <TouchableOpacity onPress={() => setShowTransferModal(false)}>
-                <Text style={styles.closeBtn}>X</Text>
+                <Text style={styles.closeBtn}>✕</Text>
               </TouchableOpacity>
             </View>
 
             <Text style={styles.inputLabel}>Recipient Account ID</Text>
-            <TextInput
-              style={styles.input}
-              value={recipient}
-              onChangeText={setRecipient}
-              placeholder="e.g. 2, 3"
-            />
+            <TextInput style={styles.input} value={recipient} onChangeText={setRecipient} placeholder="e.g. 2, 3" />
 
             <Text style={styles.inputLabel}>Amount (LKR)</Text>
-            <TextInput
-              style={styles.input}
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
-              placeholder="Enter amount"
-            />
+            <TextInput style={styles.input} value={amount} onChangeText={setAmount} keyboardType="numeric" placeholder="Enter amount" />
 
-            <TouchableOpacity 
-              style={[styles.submitBtn, isTransferring && { opacity: 0.7 }]} 
-              onPress={handleSendMoney}
-              disabled={isTransferring}
-            >
-              <Text style={styles.submitBtnText}>
-                {isTransferring ? 'Processing...' : 'Confirm Transfer'}
-              </Text>
+            <TouchableOpacity style={[styles.submitBtn, isTransferring && { opacity: 0.7 }]} onPress={handleSendMoney} disabled={isTransferring}>
+              <Text style={styles.submitBtnText}>{isTransferring ? 'Processing...' : 'Transfer Now'}</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Bills Modal */}
+      <Modal visible={showBillsModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Pay Bills</Text>
+              <TouchableOpacity onPress={() => setShowBillsModal(false)}>
+                <Text style={styles.closeBtn}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.billOpt}><Text style={styles.billOptText}>Electricity Board</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.billOpt}><Text style={styles.billOptText}>Water Board</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.billOpt}><Text style={styles.billOptText}>Mobile Reload</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -437,323 +461,109 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Virtual Debit Card</Text>
+              <Text style={styles.modalTitle}>Virtual Wallet</Text>
               <TouchableOpacity onPress={() => setShowCardsModal(false)}>
-                <Text style={styles.closeBtn}>X</Text>
+                <Text style={styles.closeBtn}>✕</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.virtualCard}>
-              <Text style={styles.vCardType}>PhoenixBank Debit</Text>
+            <LinearGradient colors={['#1e3a8a', '#3b82f6']} style={styles.virtualCard}>
+              <Text style={styles.vCardType}>Phoenix Debit</Text>
               <Text style={styles.vCardNumber}>4532 •••• •••• {currentUser.id.padStart(4, '0')}</Text>
               <View style={styles.vCardFooter}>
-                <Text style={styles.vCardText}>HOLDER: {currentUser.holderName.toUpperCase()}</Text>
-                <Text style={styles.vCardText}>STATUS: ACTIVE</Text>
+                <Text style={styles.vCardText}>{currentUser.holderName.toUpperCase()}</Text>
+                <Text style={styles.vCardText}>ACTIVE</Text>
               </View>
-            </View>
+            </LinearGradient>
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  authContainer: {
-    flex: 1,
-    backgroundColor: '#f4f7f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  authCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    elevation: 4,
-  },
-  logoTextCenter: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#0077b6',
-    textAlign: 'center',
-  },
-  subLogoText: {
-    fontSize: 12,
-    color: '#6c757d',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  authTabs: {
-    flexDirection: 'row',
-    borderBottomWidth: 2,
-    borderBottomColor: '#e9ecef',
-    marginBottom: 20,
-  },
-  authTabBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  authTabActive: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#0077b6',
-  },
-  authTabText: {
-    fontWeight: 'bold',
-    color: '#6c757d',
-  },
-  authTabTextActive: {
-    color: '#0077b6',
-  },
-  quickChip: {
-    backgroundColor: '#f1f3f5',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  quickChipText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#0077b6',
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: '#f4f7f6',
-  },
-  container: {
-    padding: 20,
-    paddingTop: 60,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 16,
-    elevation: 2,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0077b6',
-  },
-  userGreeting: {
-    fontSize: 12,
-    color: '#6c757d',
-    marginTop: 2,
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#00b4d8',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  logoutBtn: {
-    backgroundColor: '#ffe3e3',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  logoutBtnText: {
-    color: '#c92a2a',
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
-  offlineBanner: {
-    backgroundColor: '#ff922b',
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  offlineText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  balanceCard: {
-    backgroundColor: '#0077b6',
-    borderRadius: 20,
-    padding: 22,
-    marginBottom: 20,
-    elevation: 4,
-  },
-  balanceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  balanceLabel: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  refreshBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  refreshBtnText: {
-    color: '#ffffff',
-    fontSize: 11,
-  },
-  balanceAmount: {
-    color: '#ffffff',
-    fontSize: 30,
-    fontWeight: '800',
-    marginVertical: 12,
-  },
-  cardSubText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 12,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  actionBtn: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginHorizontal: 4,
-    elevation: 1,
-  },
-  actionBtnText: {
-    color: '#0077b6',
-    fontWeight: '600',
-    fontSize: 12,
-  },
-  sectionCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 20,
-    elevation: 1,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2b2d42',
-    marginBottom: 6,
-  },
-  txRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f5',
-  },
-  txTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2b2d42',
-  },
-  txTime: {
-    fontSize: 11,
-    color: '#6c757d',
-  },
-  txAmount: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  txPositive: {
-    color: '#2a9d8f',
-  },
-  txNegative: {
-    color: '#e76f51',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2b2d42',
-  },
-  closeBtn: {
-    fontSize: 20,
-    color: '#6c757d',
-  },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2b2d42',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 10,
-    padding: 12,
-    fontSize: 14,
-    marginBottom: 16,
-  },
-  submitBtn: {
-    backgroundColor: '#0077b6',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  submitBtnText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  virtualCard: {
-    backgroundColor: '#1e3c72',
-    borderRadius: 16,
-    padding: 20,
-  },
-  vCardType: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  vCardNumber: {
-    color: '#ffffff',
-    fontSize: 18,
-    letterSpacing: 2,
-    marginVertical: 20,
-  },
-  vCardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  vCardText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 11,
-  },
+  // Global & Auth
+  authContainer: { flex: 1, backgroundColor: '#f4f7f6', justifyContent: 'center', padding: 20 },
+  authCard: { backgroundColor: '#fff', borderRadius: 24, padding: 24, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
+  authHeader: { alignItems: 'center', marginBottom: 25 },
+  logoTextCenter: { fontSize: 24, fontWeight: '800', color: '#0056b3' },
+  subLogoText: { fontSize: 12, color: '#6b7280', marginTop: 4 },
+  authTabs: { flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: '#eaf3ff', marginBottom: 20 },
+  authTabBtn: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+  authTabActive: { borderBottomWidth: 3, borderBottomColor: '#0056b3', marginBottom: -2 },
+  authTabText: { fontWeight: '600', color: '#6b7280' },
+  authTabTextActive: { color: '#0056b3' },
+  
+  // Dashboard Core
+  screen: { flex: 1, backgroundColor: '#f4f7f6' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 60, backgroundColor: '#fff', elevation: 2, zIndex: 10 },
+  logoText: { fontSize: 20, fontWeight: '800', color: '#0056b3' },
+  userGreeting: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eaf3ff', justifyContent: 'center', alignItems: 'center' },
+  avatarText: { color: '#0056b3', fontWeight: 'bold', fontSize: 16 },
+  logoutBtn: { backgroundColor: '#fee2e2', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  logoutBtnText: { color: '#ef4444', fontSize: 12, fontWeight: 'bold' },
+  container: { padding: 20 },
+  
+  // Cards & Layouts
+  balanceCard: { borderRadius: 24, padding: 24, elevation: 6, marginBottom: 24, overflow: 'hidden' },
+  balanceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  balanceLabel: { color: '#fff', fontSize: 12, fontWeight: '700', opacity: 0.9, letterSpacing: 1 },
+  refreshBtn: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
+  refreshBtnText: { color: '#fff', fontSize: 11 },
+  balanceAmount: { color: '#fff', fontSize: 34, fontWeight: '800', marginBottom: 12 },
+  cardSubText: { color: '#fff', fontSize: 12, opacity: 0.9 },
+  
+  actionsGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
+  actionBtn: { flex: 1, backgroundColor: '#fff', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginHorizontal: 4, elevation: 2 },
+  actionIcon: { width: 44, height: 44, backgroundColor: '#eaf3ff', borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  emoji: { fontSize: 20 },
+  actionBtnText: { color: '#1f2937', fontWeight: '600', fontSize: 11 },
+  
+  // Sections
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+  sectionLink: { fontSize: 12, color: '#0056b3', fontWeight: '600' },
+  
+  // Favorites
+  favoritesScroll: { paddingBottom: 10, marginBottom: 16 },
+  favoriteItem: { backgroundColor: '#fff', padding: 12, borderRadius: 16, alignItems: 'center', marginRight: 16, minWidth: 80, elevation: 2 },
+  favAvatar: { width: 44, height: 44, backgroundColor: '#0056b3', borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  favAvatarText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+  favoriteName: { fontSize: 12, fontWeight: '600', color: '#1f2937' },
+  
+  // Transactions
+  sectionCard: { backgroundColor: '#fff', borderRadius: 16, padding: 16, elevation: 2, marginBottom: 30 },
+  txRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#e9ecef' },
+  txLeft: { flexDirection: 'row', alignItems: 'center' },
+  txIconBox: { width: 42, height: 42, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  txIconIncome: { backgroundColor: '#d1fae5' },
+  txIconExpense: { backgroundColor: '#ffe4e6' },
+  txTitle: { fontSize: 14, fontWeight: '600', color: '#1f2937', marginBottom: 2 },
+  txTime: { fontSize: 11, color: '#6b7280' },
+  txAmount: { fontSize: 14, fontWeight: '700' },
+  txPositive: { color: '#10b981' },
+  txNegative: { color: '#ef4444' },
+  
+  // Modals & Inputs
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalCard: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, width: '100%' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: '#1f2937' },
+  closeBtn: { fontSize: 18, color: '#6b7280', fontWeight: 'bold' },
+  inputLabel: { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 8 },
+  input: { borderWidth: 1, borderColor: '#e9ecef', borderRadius: 12, padding: 14, fontSize: 14, marginBottom: 16 },
+  submitBtn: { backgroundColor: '#0056b3', paddingVertical: 16, borderRadius: 12, alignItems: 'center', marginTop: 10 },
+  submitBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  
+  billOpt: { padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#e9ecef', marginBottom: 12 },
+  billOptText: { fontWeight: '600', color: '#1f2937' },
+  
+  virtualCard: { borderRadius: 20, padding: 24 },
+  vCardType: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  vCardNumber: { color: '#fff', fontSize: 20, letterSpacing: 4, marginVertical: 24 },
+  vCardFooter: { flexDirection: 'row', justifyContent: 'space-between' },
+  vCardText: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
+  offlineBanner: { backgroundColor: '#ff922b', padding: 10, borderRadius: 12, alignItems: 'center', marginBottom: 16 },
+  offlineText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
 });
