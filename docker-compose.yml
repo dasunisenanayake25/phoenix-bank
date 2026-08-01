@@ -27,7 +27,7 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Rate2002#@maths
+      POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: phoenix_ledger
     ports:
       - "5433:5432"
