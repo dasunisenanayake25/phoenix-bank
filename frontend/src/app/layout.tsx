@@ -15,13 +15,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="app-container">
-          <header className="header">
-            <h1>PhoenixBank</h1>
-            <div className="header-user">
-              <span>Good morning, User</span>
-              <div className="avatar">U</div>
-            </div>
-          </header>
           <main>{children}</main>
         </div>
       </body>
