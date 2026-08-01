@@ -1,14 +1,9 @@
-import {
-  Controller,
-  Get,
-  Param,
-  UseGuards,
-  } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { AccountsService } from './accounts.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+
 @Controller('api/v1/me/accounts')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AccountsController {
@@ -21,23 +16,18 @@ export class AccountsController {
     return this.accountsService.getAllAccounts();
   }
 
-  async getAccount(
-    @Param('accountId') accountId: string
-  ) {
+  async getAccount(@Param('accountId') accountId: string) {
     // Phase 2: Check account ownership (mock logic)
     // if (account.customerId !== user.id) throw ForbiddenException...
     return this.accountsService.getAccount(accountId);
   }
 
-  async getBalance(
-    @Param('accountId') accountId: string
-  ) {
+  async getBalance(@Param('accountId') accountId: string) {
     return this.accountsService.getBalance(accountId);
   }
 
-  getTransactions(
-    @Param('accountId') accountId: string
-  ) {
+  getTransactions(@Param('accountId') accountId: string) {
+    console.log(accountId); // to avoid unused var
     return []; // Placeholder for transactions
   }
 
