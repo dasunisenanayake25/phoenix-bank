@@ -17,7 +17,11 @@ export class AccountsController {
   }
 
   @Post('register')
+<<<<<<< HEAD
   async register(@Body() body: { name: string; email: string; password?: string; initialDeposit?: number; currency?: string }) {
+=======
+  async register(@Body() body: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }) {
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     return this.accountsService.registerAccount(body);
   }
 
