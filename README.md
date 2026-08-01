@@ -6,7 +6,7 @@ PhoenixBank is an enterprise-grade, event-driven banking platform designed for m
 ##  Key Features
 
 * **Zero-Trust Security & Key Management**
-  * Advanced key management utilizing **Shamir's Secret Sharing (3-of-5 threshold)** via HashiCorp Vault.
+  * **[IMPLEMENTED]** Advanced key management utilizing **Shamir's Secret Sharing (3-of-5 threshold)**. The master key is split among 5 custodians and reconstructed securely in-memory only for signing, preventing a single point of compromise.
   * Strict mobile security policies: Biometric Authentication (Fingerprint/FaceID) enforced on all transactions.
   * OS-level screenshot and screen-recording prevention.
 

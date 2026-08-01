@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
+import { KeyCeremonyModule } from './key-ceremony/key-ceremony.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AccountsModule } from './accounts/accounts.module';
       inject: [ConfigService],
     }),
     AccountsModule,
+    KeyCeremonyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
