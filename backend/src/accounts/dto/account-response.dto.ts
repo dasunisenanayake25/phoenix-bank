@@ -1,4 +1,8 @@
-import { AccountStatus, AccountType, Account } from '../entities/account.entity';
+import {
+  AccountStatus,
+  AccountType,
+  Account,
+} from '../entities/account.entity';
 
 export class AccountResponseDto {
   id: string;
@@ -7,7 +11,7 @@ export class AccountResponseDto {
   currency: string;
   accountType: AccountType;
   status: AccountStatus;
-  
+
   constructor(partial: Partial<Account>) {
     this.id = partial.id!;
     this.holderName = partial.holderName!;
