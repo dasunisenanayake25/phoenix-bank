@@ -1,0 +1,41 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: accounts-service
+    url: http://host.docker.internal:4001/accounts
+    routes:
+      - name: accounts-route
+        paths:
+          - /api/accounts
+        strip_path: true
+
+  - name: payments-service
+    url: http://host.docker.internal:4003/payments
+    routes:
+      - name: payments-route
+        paths:
+          - /api/payments
+        strip_path: true
+
+  - name: fraud-service
+    url: http://host.docker.internal:5000/fraud
+    routes:
+      - name: fraud-route
+        paths:
+          - /api/fraud
+        strip_path: true
+
+  - name: vault-service
+    url: http://vault:8200/v1
+    routes:
+      - name: vault-route
+        paths:
+          - /api/vault
+        strip_path: true
+
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 20
+      policy: local
