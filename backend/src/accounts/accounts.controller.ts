@@ -1,59 +1,39 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, ForbiddenException } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { AccountsService } from './accounts.service';
-import { AuthGuard } from './auth.guard';
-import { TokenService } from './token.service';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { UserRole } from '../identity/entities/user.entity';
 
-@Controller('accounts')
+@Controller('api/v1/me/accounts')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
-  @Get('all')
-  async getAllAccounts() {
+  @Get()
+  async getMyAccounts(@CurrentUser() user: any) {
+    // In a real DB, query accounts where customerId = user.id
+    // For demo, we just get all and filter (or pretend)
     return this.accountsService.getAllAccounts();
   }
 
-  @UseGuards(AuthGuard)
-  @Get(':id/balance')
-  async getBalance(@Param('id') id: string, @Req() req: any) {
-    if (req.user.id !== id) {
-      throw new ForbiddenException("Forbidden resource: You cannot access another account's balance.");
-    }
-    return this.accountsService.getBalance(id);
+  @Get(':accountId')
+  async getAccount(@Param('accountId') accountId: string, @CurrentUser() user: any) {
+    // Phase 2: Check account ownership (mock logic)
+    // if (account.customerId !== user.id) throw ForbiddenException...
+    return this.accountsService.getAccount(accountId);
   }
 
-  @Post('register')
-  async register(@Body() body: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }) {
-    const account = await this.accountsService.registerAccount(body);
-    const token = await TokenService.generateToken({ id: account.id, name: account.holderName });
-    return {
-      id: account.id,
-      customerId: account.customerId,
-      holderName: account.holderName,
-      email: account.email,
-      balance: account.balance,
-      currency: account.currency,
-      accountType: account.accountType,
-      status: account.status,
-      token,
-    };
+  @Get(':accountId/balance')
+  async getBalance(@Param('accountId') accountId: string, @CurrentUser() user: any) {
+    return this.accountsService.getBalance(accountId);
   }
 
-  @Post('login')
-  async login(@Body() body: { identifier: string; password?: string }) {
-    const account = await this.accountsService.loginAccount(body.identifier, body.password);
-    const token = await TokenService.generateToken({ id: account.id, name: account.holderName });
-    return {
-      id: account.id,
-      customerId: account.customerId,
-      holderName: account.holderName,
-      email: account.email,
-      balance: account.balance,
-      currency: account.currency,
-      accountType: account.accountType,
-      status: account.status,
-      token,
-    };
+  @Get(':accountId/transactions')
+  async getTransactions(@Param('accountId') accountId: string, @CurrentUser() user: any) {
+    return []; // Placeholder for transactions
   }
 
   @EventPattern('transfer-initiated')

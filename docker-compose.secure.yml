@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - data_network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - application_network
+      - data_network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_DB: ${POSTGRES_DB:-phoenix_ledger}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - data_network
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - data_network
+
+  vault:
+    image: hashicorp/vault:1.13
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-phoenix-master-token}
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    networks:
+      - data_network
+
+  kong:
+    image: kong:3.4.0-ubuntu
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: "/etc/kong/kong.yml"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_ERROR_LOG: "/dev/stderr"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml
+    networks:
+      - public_network
+      - application_network
+
+  fraud-detection:
+    build:
+      context: ./fraud-detection
+    environment:
+      - KAFKA_BROKER_URL=kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - application_network
+
+volumes:
+  postgres_data:
+
+networks:
+  public_network:
+  application_network:
+  data_network:
