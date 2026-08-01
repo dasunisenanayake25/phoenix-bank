@@ -19,18 +19,16 @@ export class AccountsService implements OnModuleInit {
         await this.accountsRepository.save([
           {
             id: '1',
-            customerId: 'cust-user-100',
             holderName: 'User',
-            balance: 150000.00,
+            balance: 15000000,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,
           },
           {
             id: '2',
-            customerId: 'cust-amila-101',
             holderName: 'Amila',
-            balance: 50000.00,
+            balance: 5000000,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,

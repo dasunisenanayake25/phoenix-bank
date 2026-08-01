@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
 import { IdentityModule } from './identity/identity.module';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { IdentityModule } from './identity/identity.module';
     }),
     AccountsModule,
     IdentityModule,
+    CustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
