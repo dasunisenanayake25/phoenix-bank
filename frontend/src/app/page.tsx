@@ -209,13 +209,13 @@ export default function Home() {
         <nav className="lp-navbar">
           <div className="lp-logo">PHOENIXBANK</div>
           <div className="lp-nav-links">
-            <a href="#">Architecture</a>
-            <a href="#">Security</a>
-            <a href="#">DevOps</a>
-            <a href="#">Insights</a>
+            <a href="#">Personal</a>
+            <a href="#">Business</a>
+            <a href="#">Cards</a>
+            <a href="#">About Us</a>
           </div>
           <button className="lp-login-btn" onClick={() => setShowAuthModal(true)}>
-            Schedule Consultation
+            Access Account
           </button>
         </nav>
 

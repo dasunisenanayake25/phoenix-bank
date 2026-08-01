@@ -31,6 +31,7 @@ export default function App() {
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Feature Modals
   const [showTransferModal, setShowTransferModal] = useState(false);
@@ -241,58 +242,83 @@ export default function App() {
     }
   };
 
-  // --- Auth View if no active session ---
+  // --- Landing Page View if no active session ---
   if (!currentUser) {
     return (
-      <View style={styles.authContainer}>
-        <StatusBar style="dark" />
-        <View style={styles.authCard}>
-          <View style={styles.authHeader}>
-            <Text style={styles.logoTextCenter}>PhoenixBank</Text>
-            <Text style={styles.subLogoText}>Zero-Trust Mobile Banking</Text>
+      <View style={styles.lpContainer}>
+        <StatusBar style="light" />
+        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.lpHeader}>
+          <Text style={styles.lpTitle}>PhoenixBank</Text>
+          <Text style={styles.lpHeroText}>Achieve Financial Success & Security</Text>
+          <Text style={styles.lpHeroSub}>Experience the next generation of banking with our Zero-Trust architecture.</Text>
+          <TouchableOpacity style={styles.lpBtn} onPress={() => setShowAuthModal(true)}>
+            <Text style={styles.lpBtnText}>Access Account</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+        <ScrollView style={styles.lpBody} showsVerticalScrollIndicator={false}>
+          <View style={styles.lpCard}>
+            <View style={styles.lpCardIconBox}><Text style={styles.lpCardIcon}>M</Text></View>
+            <Text style={styles.lpCardTitle}>Microservices</Text>
+            <Text style={styles.lpCardDesc}>Event-driven architecture using Kafka for high-throughput, decoupled inter-service communication.</Text>
           </View>
-
-          <View style={styles.authTabs}>
-            <TouchableOpacity style={[styles.authTabBtn, authTab === 'login' && styles.authTabActive]} onPress={() => setAuthTab('login')}>
-              <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.authTabBtn, authTab === 'register' && styles.authTabActive]} onPress={() => setAuthTab('register')}>
-              <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>Register</Text>
-            </TouchableOpacity>
+          <View style={styles.lpCard}>
+            <View style={styles.lpCardIconBox}><Text style={styles.lpCardIcon}>AI</Text></View>
+            <Text style={styles.lpCardTitle}>AI Fraud Detection</Text>
+            <Text style={styles.lpCardDesc}>Real-time anomaly detection instantly flagging suspicious transactions.</Text>
           </View>
+          <View style={styles.lpCard}>
+            <View style={styles.lpCardIconBox}><Text style={styles.lpCardIcon}>Z</Text></View>
+            <Text style={styles.lpCardTitle}>Zero-Trust Vault</Text>
+            <Text style={styles.lpCardDesc}>Advanced key management featuring Shamir's Secret Sharing and HashiCorp Vault.</Text>
+          </View>
+        </ScrollView>
 
-          {authTab === 'login' ? (
-            <View>
-              <Text style={styles.inputLabel}>Account ID or Email</Text>
-              <TextInput style={styles.input} value={loginIdentifier} onChangeText={setLoginIdentifier} />
+        <Modal visible={showAuthModal} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Security Gateway</Text>
+                <TouchableOpacity onPress={() => setShowAuthModal(false)}>
+                  <Text style={styles.closeBtn}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.authTabs}>
+                <TouchableOpacity style={[styles.authTabBtn, authTab === 'login' && styles.authTabActive]} onPress={() => setAuthTab('login')}>
+                  <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.authTabBtn, authTab === 'register' && styles.authTabActive]} onPress={() => setAuthTab('register')}>
+                  <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>Register</Text>
+                </TouchableOpacity>
+              </View>
 
-              <Text style={styles.inputLabel}>Password</Text>
-              <TextInput style={styles.input} value={loginPassword} onChangeText={setLoginPassword} secureTextEntry />
-
-              <TouchableOpacity style={styles.submitBtn} onPress={handleLogin} disabled={isSubmittingAuth}>
-                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Authenticating...' : 'Login securely'}</Text>
-              </TouchableOpacity>
+              {authTab === 'login' ? (
+                <View>
+                  <Text style={styles.inputLabel}>Account ID or Email</Text>
+                  <TextInput style={styles.input} value={loginIdentifier} onChangeText={setLoginIdentifier} />
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <TextInput style={styles.input} value={loginPassword} onChangeText={setLoginPassword} secureTextEntry />
+                  <TouchableOpacity style={styles.submitBtn} onPress={handleLogin} disabled={isSubmittingAuth}>
+                    <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Authenticating...' : 'Login securely'}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View>
+                  <Text style={styles.inputLabel}>Full Name</Text>
+                  <TextInput style={styles.input} value={regName} onChangeText={setRegName} />
+                  <Text style={styles.inputLabel}>Email Address</Text>
+                  <TextInput style={styles.input} value={regEmail} onChangeText={setRegEmail} keyboardType="email-address" />
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <TextInput style={styles.input} value={regPassword} onChangeText={setRegPassword} secureTextEntry />
+                  <Text style={styles.inputLabel}>Confirm Password</Text>
+                  <TextInput style={styles.input} value={regConfirmPassword} onChangeText={setRegConfirmPassword} secureTextEntry />
+                  <TouchableOpacity style={styles.submitBtn} onPress={handleRegister} disabled={isSubmittingAuth}>
+                    <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Creating...' : 'Open Account'}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-          ) : (
-            <View>
-              <Text style={styles.inputLabel}>Full Name</Text>
-              <TextInput style={styles.input} value={regName} onChangeText={setRegName} />
-
-              <Text style={styles.inputLabel}>Email Address</Text>
-              <TextInput style={styles.input} value={regEmail} onChangeText={setRegEmail} keyboardType="email-address" />
-
-              <Text style={styles.inputLabel}>Password</Text>
-              <TextInput style={styles.input} value={regPassword} onChangeText={setRegPassword} secureTextEntry />
-
-              <Text style={styles.inputLabel}>Confirm Password</Text>
-              <TextInput style={styles.input} value={regConfirmPassword} onChangeText={setRegConfirmPassword} secureTextEntry />
-
-              <TouchableOpacity style={styles.submitBtn} onPress={handleRegister} disabled={isSubmittingAuth}>
-                <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Creating...' : 'Open Account'}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -482,10 +508,21 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  // Global & Auth
-  authContainer: { flex: 1, backgroundColor: '#f4f7f6', justifyContent: 'center', padding: 20 },
-  authCard: { backgroundColor: '#fff', borderRadius: 24, padding: 24, elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
-  authHeader: { alignItems: 'center', marginBottom: 25 },
+  // Global & Landing Page
+  lpContainer: { flex: 1, backgroundColor: '#f8fafc' },
+  lpHeader: { padding: 30, paddingTop: 60, paddingBottom: 40, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
+  lpTitle: { color: '#fbbf24', fontSize: 18, fontWeight: 'bold', marginBottom: 20 },
+  lpHeroText: { color: '#fff', fontSize: 32, fontWeight: 'bold', lineHeight: 40, marginBottom: 10 },
+  lpHeroSub: { color: '#cbd5e1', fontSize: 14, lineHeight: 22, marginBottom: 30 },
+  lpBtn: { backgroundColor: '#d97706', paddingVertical: 15, borderRadius: 12, alignItems: 'center' },
+  lpBtnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  lpBody: { padding: 20 },
+  lpCard: { backgroundColor: '#fff', padding: 24, borderRadius: 16, marginBottom: 20, elevation: 4, borderTopWidth: 4, borderTopColor: '#d97706' },
+  lpCardIconBox: { width: 40, height: 40, backgroundColor: '#f1f5f9', borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
+  lpCardIcon: { fontSize: 16, fontWeight: 'bold', color: '#0f172a' },
+  lpCardTitle: { fontSize: 18, fontWeight: 'bold', color: '#0f172a', marginBottom: 10 },
+  lpCardDesc: { fontSize: 14, color: '#64748b', lineHeight: 20 },
+
   logoTextCenter: { fontSize: 24, fontWeight: '800', color: '#0056b3' },
   subLogoText: { fontSize: 12, color: '#6b7280', marginTop: 4 },
   authTabs: { flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: '#eaf3ff', marginBottom: 20 },
