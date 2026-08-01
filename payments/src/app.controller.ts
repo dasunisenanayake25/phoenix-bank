@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Inject, OnModuleInit } from '@nestjs/common';
+import { Controller, Post, Body, Inject, OnModuleInit, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
+import { AuthGuard } from './auth.guard';
 
 @Controller('payments')
 export class AppController implements OnModuleInit {
@@ -12,9 +13,18 @@ export class AppController implements OnModuleInit {
     await this.kafkaClient.connect();
   }
 
+  @UseGuards(AuthGuard)
   @Post('transfer')
-  async transferFunds(@Body() transferDto: { fromAccountId: number; toAccountId: number; amount: number }) {
-    // 1. Validate request (mocked)
+  async transferFunds(
+    @Body() transferDto: { fromAccountId: number; toAccountId: number; amount: number },
+    @Req() req: any,
+  ) {
+    // Prevent Broken Object Level Authorization (BOLA)
+    if (req.user.id !== transferDto.fromAccountId.toString()) {
+      throw new ForbiddenException("Forbidden resource: You cannot transfer funds from another user's account.");
+    }
+
+    // 1. Validate request
     if (transferDto.amount <= 0) {
       return { status: 'error', message: 'Amount must be greater than zero' };
     }

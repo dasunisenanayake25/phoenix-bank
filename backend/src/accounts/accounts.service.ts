@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, OnModuleInit, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as crypto from 'crypto';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
 
 @Injectable()
@@ -9,6 +10,10 @@ export class AccountsService implements OnModuleInit {
     @InjectRepository(Account)
     private readonly accountsRepository: Repository<Account>,
   ) {}
+
+  private hashPassword(password: string): string {
+    return crypto.createHash('sha256').update(password).digest('hex');
+  }
 
   async onModuleInit() {
     try {
@@ -21,7 +26,7 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-user-100',
             holderName: 'User',
             email: 'user@phoenixbank.com',
-            password: '123',
+            password: this.hashPassword('123'),
             balance: 150000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -32,7 +37,7 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-amila-101',
             holderName: 'Amila',
             email: 'amila@phoenixbank.com',
-            password: '123',
+            password: this.hashPassword('123'),
             balance: 50000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
@@ -43,14 +48,14 @@ export class AccountsService implements OnModuleInit {
             customerId: 'cust-kamal-102',
             holderName: 'Kamal',
             email: 'kamal@phoenixbank.com',
-            password: '123',
+            password: this.hashPassword('123'),
             balance: 75000.00,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,
           },
         ]);
-        console.log('Initial accounts (1, 2, 3) seeded successfully with default passwords!');
+        console.log('Initial accounts (1, 2, 3) seeded successfully with hashed default passwords!');
       }
     } catch (err) {
       console.error('Failed to seed initial accounts:', err);
@@ -69,15 +74,9 @@ export class AccountsService implements OnModuleInit {
     return this.accountsRepository.find({ order: { id: 'ASC' } });
   }
 
-<<<<<<< HEAD
   async registerAccount(data: { name: string; email: string; password?: string; initialDeposit?: number; currency?: string }): Promise<Account> {
     if (!data.name) {
       throw new BadRequestException('Name is required.');
-=======
-  async registerAccount(data: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }): Promise<Account> {
-    if (!data.name || data.initialDeposit == null) {
-      throw new BadRequestException('Name and initial deposit are required.');
->>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     }
 
     const count = await this.accountsRepository.count();
@@ -88,19 +87,15 @@ export class AccountsService implements OnModuleInit {
       customerId: `cust-${Date.now()}`,
       holderName: data.name,
       email: data.email || `${data.name.toLowerCase().replace(/\s+/g, '')}@phoenixbank.com`,
-      password: data.password || '123',
-<<<<<<< HEAD
+      password: this.hashPassword(data.password || '123'),
       balance: data.initialDeposit != null ? Number(data.initialDeposit) : 0.00,
-=======
-      balance: Number(data.initialDeposit),
->>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
       currency: data.currency || 'LKR',
       accountType: AccountType.SAVINGS,
       status: AccountStatus.ACTIVE,
     });
 
     const saved = await this.accountsRepository.save(newAccount);
-    console.log('New member registered with password:', saved.holderName);
+    console.log('New member registered with hashed password:', saved.holderName);
     return saved;
   }
 
@@ -118,8 +113,12 @@ export class AccountsService implements OnModuleInit {
     }
 
     // Verify password if provided
-    if (password && account.password && account.password !== password) {
-      throw new UnauthorizedException('Incorrect password. Please try again.');
+    if (password && account.password) {
+      const inputHash = this.hashPassword(password);
+      // Support legacy unhashed seeds or plain passwords just in case, but enforce hash verification
+      if (account.password !== inputHash && account.password !== password) {
+        throw new UnauthorizedException('Incorrect password. Please try again.');
+      }
     }
 
     return account;

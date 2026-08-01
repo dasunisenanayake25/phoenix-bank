@@ -6,9 +6,9 @@ import requests
 import os
 
 class VaultClient:
-    def __init__(self, vault_url: str = "http://localhost:8200", token: str = "phoenix-master-token"):
-        self.vault_url = vault_url
-        self.token = token
+    def __init__(self, vault_url: str = None, token: str = None):
+        self.vault_url = vault_url or os.getenv("VAULT_ADDR", "http://localhost:8200")
+        self.token = token or os.getenv("VAULT_TOKEN", "phoenix-master-token")
         self.headers = {"X-Vault-Token": self.token}
 
     def get_secret(self, path: str = "secret/data/phoenix/ledger") -> dict:
