@@ -26,15 +26,16 @@ export class TokenService {
         if (secret) {
           this.jwtSecret = secret;
           console.log('Successfully fetched JWT_SECRET from HashiCorp Vault.');
-          return this.jwtSecret;
+          return secret;
         }
       }
     } catch (e) {
       // Ignore and fallback
     }
 
-    this.jwtSecret = process.env.JWT_SECRET || 'phoenix_bank_jwt_secure_key_2065';
-    return this.jwtSecret;
+    const fallbackSecret = process.env.JWT_SECRET || 'phoenix_bank_jwt_secure_key_2065';
+    this.jwtSecret = fallbackSecret;
+    return fallbackSecret;
   }
 
   static async generateToken(payload: { id: string; name: string }): Promise<string> {
