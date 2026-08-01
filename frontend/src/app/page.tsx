@@ -150,13 +150,6 @@ export default function Home() {
       return;
     }
 
-    const numDeposit = parseFloat(regDeposit);
-    if (isNaN(numDeposit) || numDeposit < 0) {
-      setAuthMsg("Please enter a valid initial deposit amount.");
-      setIsSubmittingAuth(false);
-      return;
-    }
-
     try {
       const res = await fetch("http://localhost:8000/api/accounts/register", {
         method: "POST",
@@ -165,7 +158,6 @@ export default function Home() {
           name: regName,
           email: regEmail,
           password: regPassword,
-          initialDeposit: numDeposit,
           currency: "LKR",
         }),
       });
@@ -376,16 +368,6 @@ export default function Home() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Initial Deposit (LKR)</label>
-                <input
-                  type="number"
-                  value={regDeposit}
-                  onChange={(e) => setRegDeposit(e.target.value)}
-                  placeholder="Enter deposit amount"
-                  required
-                />
-              </div>
 
               <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
                 {isSubmittingAuth ? "Creating Account..." : "Create New Member Account"}
