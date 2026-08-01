@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import time
+import os
 from datetime import datetime
 from typing import List, Dict, Any
 from fastapi import FastAPI, BackgroundTasks, HTTPException
@@ -120,9 +121,10 @@ async def kafka_consumer_loop():
     logger.info("Connecting Kafka Consumer for Fraud Engine...")
     try:
         from kafka import KafkaConsumer
+        kafka_broker = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
         consumer = KafkaConsumer(
             'transfer-initiated',
-            bootstrap_servers=['localhost:9092'],
+            bootstrap_servers=[kafka_broker],
             auto_offset_reset='latest',
             value_deserializer=lambda m: json.loads(m.decode('utf-8'))
         )
@@ -143,4 +145,4 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8500)
+    uvicorn.run("main:app", host="0.0.0.0", port=8500)
