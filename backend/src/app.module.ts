@@ -34,10 +34,12 @@ import { IdentityModule } from './identity/identity.module';
           clearTimeout(timeoutId);
 
           if (res.ok) {
-            const data = await res.json();
-            const secrets = data?.data?.data || {};
-            if (secrets.DB_PASSWORD) {
-              dbPassword = secrets.DB_PASSWORD;
+            const data = (await res.json()) as {
+              data?: { data?: Record<string, string> };
+            };
+            const secrets = data?.data?.data ?? {};
+            if (secrets['DB_PASSWORD']) {
+              dbPassword = secrets['DB_PASSWORD'];
               console.log(
                 'Successfully loaded DB_PASSWORD from HashiCorp Vault.',
               );
