@@ -105,7 +105,19 @@ export default function App() {
   const fetchLatestBalance = async (accId) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/accounts/${accId}/balance`);
+      const saved = await AsyncStorage.getItem('@phoenix_session_user');
+      let token = '';
+      if (saved) {
+        try {
+          token = JSON.parse(saved).token || '';
+        } catch {}
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/accounts/${accId}/balance`, {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
       if (!response.ok) throw new Error('Server error');
 
       const data = await response.json();
@@ -115,6 +127,7 @@ export default function App() {
         email: data.email,
         balance: Number(data.balance),
         currency: data.currency || 'LKR',
+        token: (currentUser && currentUser.token) || token || '',
       };
 
       setCurrentUser(updated);
@@ -169,7 +182,13 @@ export default function App() {
           currency: 'LKR',
         }),
       });
-      if (!res.ok) throw new Error('Registration failed.');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errMsg = Array.isArray(errorData.message)
+          ? errorData.message.join(", ")
+          : errorData.message || 'Registration failed.';
+        throw new Error(errMsg);
+      }
       
       const newAcc = await res.json();
       setCurrentUser(newAcc);
@@ -204,9 +223,20 @@ export default function App() {
 
     setIsTransferring(true);
     try {
+      const saved = await AsyncStorage.getItem('@phoenix_session_user');
+      let token = '';
+      if (saved) {
+        try {
+          token = JSON.parse(saved).token || '';
+        } catch {}
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/payments/transfer`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           fromAccountId: currentUser.id,
           toAccountId: recipient,
@@ -214,7 +244,10 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) throw new Error('Transfer request failed.');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Transfer request failed.');
+      }
 
       const newTx = {
         id: Date.now().toString(),
@@ -236,7 +269,7 @@ export default function App() {
       setAmount('');
       setTimeout(() => fetchLatestBalance(currentUser.id), 1000);
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect. Try again later.');
+      Alert.alert('Error', error.message);
     } finally {
       setIsTransferring(false);
     }

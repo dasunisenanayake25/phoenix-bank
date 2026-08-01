@@ -8,7 +8,7 @@ Any 3 of the 5 key shares are required to reconstruct the Master Key and unseal 
 
 import sys
 import os
-import random
+import secrets
 import json
 import argparse
 import requests
@@ -25,7 +25,7 @@ def _eval_poly(poly, x):
 
 def split_secret(secret_int: int, k: int = 3, n: int = 5):
     """Splits a secret integer into n shares, requiring k shares to reconstruct."""
-    poly = [secret_int] + [random.randint(1, PRIME - 1) for _ in range(k - 1)]
+    poly = [secret_int] + [secrets.randbelow(PRIME - 1) + 1 for _ in range(k - 1)]
     shares = []
     for i in range(1, n + 1):
         x = i
@@ -115,8 +115,10 @@ def reconstruct_and_unseal(provided_shares_list):
         return
 
     # Attempt to store provisioned secret into HashiCorp Vault
-    vault_url = "http://localhost:8200/v1/secret/data/phoenix/ledger"
-    headers = {"X-Vault-Token": "phoenix-master-token"}
+    vault_addr = os.getenv("VAULT_ADDR", "http://localhost:8200")
+    vault_token = os.getenv("VAULT_TOKEN", "phoenix-master-token")
+    vault_url = f"{vault_addr}/v1/secret/data/phoenix/ledger"
+    headers = {"X-Vault-Token": vault_token}
     payload = {
         "data": {
             "DB_PASSWORD": "postgrespassword",
