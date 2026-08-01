@@ -40,7 +40,7 @@ export default function KeyCeremonyPage() {
           message: data.message || 'Failed to reconstruct the master key.',
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       setResult({
         success: false,
         message: 'Network error or server unavailable. Please try again.',
@@ -55,7 +55,7 @@ export default function KeyCeremonyPage() {
       <div className="max-w-2xl w-full bg-[#111c40] rounded-xl shadow-2xl overflow-hidden border border-[#d4af37]/30">
         <div className="bg-gradient-to-r from-[#d4af37] to-[#aa8c2c] p-6 text-center">
           <h1 className="text-3xl font-bold text-[#0a1128] tracking-wider uppercase">Master Key Ceremony</h1>
-          <p className="text-[#0a1128]/80 mt-2 font-medium">Shamir's Secret Sharing (3-of-5 Threshold)</p>
+          <p className="text-[#0a1128]/80 mt-2 font-medium">Shamir&apos;s Secret Sharing (3-of-5 Threshold)</p>
         </div>
         
         <div className="p-8 space-y-6">

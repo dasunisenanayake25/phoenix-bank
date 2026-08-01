@@ -21,7 +21,9 @@ export class TokenService {
       clearTimeout(timeoutId);
 
       if (res.ok) {
-        const json = await res.json();
+        const json = (await res.json()) as {
+          data?: { data?: { JWT_SECRET?: string } };
+        };
         const secret = json?.data?.data?.JWT_SECRET;
         if (secret) {
           this.jwtSecret = secret;
@@ -72,7 +74,10 @@ export class TokenService {
     if (signature !== expectedSignature) return null;
 
     try {
-      return JSON.parse(Buffer.from(data, 'base64url').toString('utf8'));
+      return JSON.parse(Buffer.from(data, 'base64url').toString('utf8')) as {
+        id: string;
+        name: string;
+      };
     } catch {
       return null;
     }

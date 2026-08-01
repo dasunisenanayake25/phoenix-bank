@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
@@ -27,6 +22,7 @@ export class AccountsService implements OnModuleInit {
       return;
     }
     try {
+      console.log('Seeding initial bank accounts without passwords...');
       const userAcc = await this.accountsRepository.findOne({
         where: { id: '1' },
       });
@@ -35,7 +31,7 @@ export class AccountsService implements OnModuleInit {
           {
             id: '1',
             holderName: 'User',
-            balance: 15000000,
+            balance: 150000.0,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,
@@ -43,7 +39,7 @@ export class AccountsService implements OnModuleInit {
           {
             id: '2',
             holderName: 'Amila',
-            balance: 5000000,
+            balance: 50000.0,
             currency: 'LKR',
             accountType: AccountType.SAVINGS,
             status: AccountStatus.ACTIVE,
@@ -80,26 +76,39 @@ export class AccountsService implements OnModuleInit {
     return Promise.all(owned.map((acc) => this.toResponseDto(acc)));
   }
 
-  async getAccountForUser(
-    id: string,
-    userId: string,
-  ): Promise<AccountResponseDto> {
-    this.assertOwnership(userId, id);
-    return this.getAccount(id);
+  async getAllAccounts(): Promise<AccountResponseDto[]> {
+    const accounts = await this.accountsRepository.find({
+      order: { id: 'ASC' },
+    });
+    return accounts.map((acc) => new AccountResponseDto(acc));
   }
 
-  async getBalanceForUser(
-    id: string,
-    userId: string,
-  ): Promise<AccountResponseDto> {
-    this.assertOwnership(userId, id);
-    return this.getBalance(id);
-  }
+  async processTransfer(data: {
+    fromAccountId: string;
+    toAccountId: string;
+    amount: number;
+  }) {
+    console.log('Processing transfer event in Accounts Ledger:', data);
 
-  async getAccount(id: string): Promise<AccountResponseDto> {
-    const account = await this.accountsRepository.findOne({ where: { id } });
-    if (!account) {
-      throw new NotFoundException('Account not found');
+    const fromAccount = await this.accountsRepository.findOne({
+      where: { id: data.fromAccountId },
+    });
+    const toAccount = await this.accountsRepository.findOne({
+      where: { id: data.toAccountId },
+    });
+
+    if (fromAccount && toAccount) {
+      if (Number(fromAccount.balance) >= data.amount) {
+        fromAccount.balance = Number(fromAccount.balance) - data.amount;
+        toAccount.balance = Number(toAccount.balance) + data.amount;
+
+        await this.accountsRepository.save([fromAccount, toAccount]);
+        console.log(`Transfer of ${data.amount} successful!`);
+      } else {
+        console.error('Insufficient funds for transfer');
+      }
+    } else {
+      console.error('One or both accounts not found');
     }
     return this.toResponseDto(account);
   }
