@@ -5,7 +5,7 @@ import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-  
+
   // Configure Kafka Consumer
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
@@ -24,4 +24,7 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Accounts Microservice is running on port ${port}`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
