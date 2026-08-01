@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Customer } from '../../customers/entities/customer.entity';
 
 export enum AccountStatus {
@@ -18,11 +26,18 @@ export class Account {
   @PrimaryColumn('varchar', { length: 64 })
   id: string;
 
-  @ManyToOne(() => Customer, customer => customer.accounts, { nullable: true })
+  @ManyToOne(() => Customer, (customer) => customer.accounts, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
-  @Column({ name: 'holder_name', type: 'varchar', length: 120, default: 'User' })
+  @Column({
+    name: 'holder_name',
+    type: 'varchar',
+    length: 120,
+    default: 'User',
+  })
   holderName: string;
 
   @Column({ type: 'bigint', default: 0 })
@@ -37,7 +52,13 @@ export class Account {
   @Column({ type: 'enum', enum: AccountStatus, default: AccountStatus.ACTIVE })
   status: AccountStatus;
 
-  @Column({ name: 'daily_limit', type: 'decimal', precision: 15, scale: 2, default: 50000.00 })
+  @Column({
+    name: 'daily_limit',
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    default: 50000.0,
+  })
   dailyLimit: number;
 
   @CreateDateColumn({ name: 'created_at' })
