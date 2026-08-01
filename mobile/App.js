@@ -21,8 +21,12 @@ export default function App() {
   // Auth Screen State
   const [authTab, setAuthTab] = useState('login');
   const [loginIdentifier, setLoginIdentifier] = useState('1');
+  const [loginPassword, setLoginPassword] = useState('123');
+
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [regDeposit, setRegDeposit] = useState('25000');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
@@ -98,11 +102,11 @@ export default function App() {
       const res = await fetch(`${API_BASE_URL}/api/accounts/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: loginIdentifier }),
+        body: JSON.stringify({ identifier: loginIdentifier, password: loginPassword }),
       });
 
       if (!res.ok) {
-        throw new Error('Account not found. Please check Account ID or Email.');
+        throw new Error('Account not found or password incorrect.');
       }
 
       const user = await res.json();
@@ -119,6 +123,11 @@ export default function App() {
   };
 
   const handleRegister = async () => {
+    if (regPassword !== regConfirmPassword) {
+      Alert.alert('Error', 'Passwords do not match! Please verify.');
+      return;
+    }
+
     const numDeposit = parseFloat(regDeposit);
     if (isNaN(numDeposit) || numDeposit < 0) {
       Alert.alert('Invalid Deposit', 'Please enter a valid deposit amount.');
@@ -133,6 +142,7 @@ export default function App() {
         body: JSON.stringify({
           name: regName,
           email: regEmail,
+          password: regPassword,
           initialDeposit: numDeposit,
           currency: 'LKR',
         }),
@@ -241,15 +251,24 @@ export default function App() {
                 placeholder="Enter Account ID (e.g. 1, 2, 3)"
               />
 
-              <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>Quick Accounts:</Text>
+              <Text style={styles.inputLabel}>Password</Text>
+              <TextInput
+                style={styles.input}
+                value={loginPassword}
+                onChangeText={setLoginPassword}
+                secureTextEntry
+                placeholder="Enter password"
+              />
+
+              <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>Quick Accounts (Pass: 123):</Text>
               <View style={{ flexDirection: 'row', gap: 6, marginBottom: 16 }}>
-                <TouchableOpacity style={styles.quickChip} onPress={() => setLoginIdentifier('1')}>
+                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('1'); setLoginPassword('123'); }}>
                   <Text style={styles.quickChipText}>Acc 1 (User)</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.quickChip} onPress={() => setLoginIdentifier('2')}>
+                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('2'); setLoginPassword('123'); }}>
                   <Text style={styles.quickChipText}>Acc 2 (Amila)</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.quickChip} onPress={() => setLoginIdentifier('3')}>
+                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('3'); setLoginPassword('123'); }}>
                   <Text style={styles.quickChipText}>Acc 3 (Kamal)</Text>
                 </TouchableOpacity>
               </View>
@@ -275,6 +294,24 @@ export default function App() {
                 onChangeText={setRegEmail}
                 placeholder="e.g. nimal@gmail.com"
                 keyboardType="email-address"
+              />
+
+              <Text style={styles.inputLabel}>Password</Text>
+              <TextInput
+                style={styles.input}
+                value={regPassword}
+                onChangeText={setRegPassword}
+                secureTextEntry
+                placeholder="Enter password"
+              />
+
+              <Text style={styles.inputLabel}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                value={regConfirmPassword}
+                onChangeText={setRegConfirmPassword}
+                secureTextEntry
+                placeholder="Confirm password"
               />
 
               <Text style={styles.inputLabel}>Initial Deposit (LKR)</Text>

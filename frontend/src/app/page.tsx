@@ -27,9 +27,14 @@ export default function Home() {
   // Auth Screen state
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [loginIdentifier, setLoginIdentifier] = useState("1");
+  const [loginPassword, setLoginPassword] = useState("123");
+  
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState("");
   const [regDeposit, setRegDeposit] = useState("25000");
+
   const [authMsg, setAuthMsg] = useState<string | null>(null);
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
@@ -46,7 +51,7 @@ export default function Home() {
   const [isTransferring, setIsTransferring] = useState(false);
   const [transferMsg, setTransferMsg] = useState<string | null>(null);
 
-  // List of accounts for Quick Transfer
+  // Contacts
   const [savedContacts, setSavedContacts] = useState<{ id: string; name: string }[]>([
     { id: "2", name: "Amila" },
     { id: "3", name: "Kamal" },
@@ -111,10 +116,11 @@ export default function Home() {
       const res = await fetch("http://localhost:8000/api/accounts/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: loginIdentifier }),
+        body: JSON.stringify({ identifier: loginIdentifier, password: loginPassword }),
       });
       if (!res.ok) {
-        throw new Error("Account not found. Please check Account ID or Email.");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Account not found or password incorrect.");
       }
       const data = await res.json();
       setCurrentUser(data);
@@ -131,12 +137,26 @@ export default function Home() {
     e.preventDefault();
     setIsSubmittingAuth(true);
     setAuthMsg(null);
+
+    if (regPassword !== regConfirmPassword) {
+      setAuthMsg("Registration Error: Passwords do not match! Please verify.");
+      setIsSubmittingAuth(false);
+      return;
+    }
+
+    if (regPassword.length < 3) {
+      setAuthMsg("Registration Error: Password must be at least 3 characters long.");
+      setIsSubmittingAuth(false);
+      return;
+    }
+
     const numDeposit = parseFloat(regDeposit);
     if (isNaN(numDeposit) || numDeposit < 0) {
       setAuthMsg("Please enter a valid initial deposit amount.");
       setIsSubmittingAuth(false);
       return;
     }
+
     try {
       const res = await fetch("http://localhost:8000/api/accounts/register", {
         method: "POST",
@@ -144,6 +164,7 @@ export default function Home() {
         body: JSON.stringify({
           name: regName,
           email: regEmail,
+          password: regPassword,
           initialDeposit: numDeposit,
           currency: "LKR",
         }),
@@ -227,7 +248,7 @@ export default function Home() {
   if (!currentUser) {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div className="card" style={{ width: "100%", maxWidth: "460px", padding: "2.5rem" }}>
+        <div className="card" style={{ width: "100%", maxWidth: "480px", padding: "2.5rem" }}>
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <h2 style={{ color: "var(--primary)", fontSize: "1.8rem", fontWeight: "bold" }}>PhoenixBank</h2>
             <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Zero-Trust Resilient Digital Banking</p>
@@ -285,12 +306,23 @@ export default function Home() {
                 />
               </div>
 
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+
               <div style={{ marginBottom: "1.2rem" }}>
-                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>Quick Demo Accounts:</span>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>Quick Demo Accounts (Password: 123):</span>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => setLoginIdentifier("1")}>Acc 1 (User)</button>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => setLoginIdentifier("2")}>Acc 2 (Amila)</button>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => setLoginIdentifier("3")}>Acc 3 (Kamal)</button>
+                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("1"); setLoginPassword("123"); }}>Acc 1 (User)</button>
+                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("2"); setLoginPassword("123"); }}>Acc 2 (Amila)</button>
+                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("3"); setLoginPassword("123"); }}>Acc 3 (Kamal)</button>
                 </div>
               </div>
 
@@ -318,6 +350,28 @@ export default function Home() {
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="e.g. nimal@gmail.com"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  placeholder="Enter secure password"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Confirm Password</label>
+                <input
+                  type="password"
+                  value={regConfirmPassword}
+                  onChange={(e) => setRegConfirmPassword(e.target.value)}
+                  placeholder="Re-enter password"
                   required
                 />
               </div>

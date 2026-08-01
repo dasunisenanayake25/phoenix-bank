@@ -17,13 +17,13 @@ export class AccountsController {
   }
 
   @Post('register')
-  async register(@Body() body: { name: string; email: string; initialDeposit: number; currency?: string }) {
+  async register(@Body() body: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }) {
     return this.accountsService.registerAccount(body);
   }
 
   @Post('login')
-  async login(@Body() body: { identifier: string }) {
-    return this.accountsService.loginAccount(body.identifier);
+  async login(@Body() body: { identifier: string; password?: string }) {
+    return this.accountsService.loginAccount(body.identifier, body.password);
   }
 
   @EventPattern('transfer-initiated')
