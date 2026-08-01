@@ -69,9 +69,15 @@ export class AccountsService implements OnModuleInit {
     return this.accountsRepository.find({ order: { id: 'ASC' } });
   }
 
+<<<<<<< HEAD
   async registerAccount(data: { name: string; email: string; password?: string; initialDeposit?: number; currency?: string }): Promise<Account> {
     if (!data.name) {
       throw new BadRequestException('Name is required.');
+=======
+  async registerAccount(data: { name: string; email: string; password?: string; initialDeposit: number; currency?: string }): Promise<Account> {
+    if (!data.name || data.initialDeposit == null) {
+      throw new BadRequestException('Name and initial deposit are required.');
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     }
 
     const count = await this.accountsRepository.count();
@@ -83,7 +89,11 @@ export class AccountsService implements OnModuleInit {
       holderName: data.name,
       email: data.email || `${data.name.toLowerCase().replace(/\s+/g, '')}@phoenixbank.com`,
       password: data.password || '123',
+<<<<<<< HEAD
       balance: data.initialDeposit != null ? Number(data.initialDeposit) : 0.00,
+=======
+      balance: Number(data.initialDeposit),
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
       currency: data.currency || 'LKR',
       accountType: AccountType.SAVINGS,
       status: AccountStatus.ACTIVE,

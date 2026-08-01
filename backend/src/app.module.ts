@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountsModule } from './accounts/accounts.module';
+<<<<<<< HEAD
+=======
+import { KeyCeremonyModule } from './key-ceremony/key-ceremony.module';
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
 
 @Module({
   imports: [
@@ -25,6 +29,10 @@ import { AccountsModule } from './accounts/accounts.module';
       inject: [ConfigService],
     }),
     AccountsModule,
+<<<<<<< HEAD
+=======
+    KeyCeremonyModule,
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
   ],
   controllers: [AppController],
   providers: [AppService],

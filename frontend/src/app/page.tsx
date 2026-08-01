@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import { useCallback, useEffect, useState } from "react";
+=======
+import { useEffect, useState } from "react";
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
 
 interface MemberAccount {
   id: string;
@@ -20,10 +24,16 @@ interface Transaction {
 }
 
 export default function Home() {
+<<<<<<< HEAD
   const apiUrl = (path: string) => `/api${path}`;
 
   const [currentUser, setCurrentUser] = useState<MemberAccount | null>(null);
   const [loading, setLoading] = useState(false);
+=======
+  const [currentUser, setCurrentUser] = useState<MemberAccount | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
 
   // Auth Screen state
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
@@ -51,7 +61,11 @@ export default function Home() {
   const [isTransferring, setIsTransferring] = useState(false);
 
   // Favorites
+<<<<<<< HEAD
   const [savedContacts] = useState<{ id: string; name: string }[]>([
+=======
+  const [savedContacts, setSavedContacts] = useState<{ id: string; name: string }[]>([
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     { id: "2", name: "Amila" },
     { id: "3", name: "Kamal" },
     { id: "4", name: "Nimal" },
@@ -65,14 +79,34 @@ export default function Home() {
     { id: "3", title: "Electricity Bill", time: "28 Jul, 10:15 AM", amount: 5200, type: "expense" },
   ]);
 
+<<<<<<< HEAD
   const fetchLatestBalance = useCallback((accId: string) => {
     setLoading(true);
     fetch(apiUrl(`/accounts/${accId}/balance`))
+=======
+  useEffect(() => {
+    const savedUser = localStorage.getItem("@phoenix_session_user");
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        setCurrentUser(parsed);
+        fetchLatestBalance(parsed.id);
+      } catch (e) {
+        localStorage.removeItem("@phoenix_session_user");
+      }
+    }
+  }, []);
+
+  const fetchLatestBalance = (accId: string) => {
+    setLoading(true);
+    fetch(`http://localhost:8000/api/accounts/${accId}/balance`)
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch balance.");
         return res.json();
       })
       .then((data) => {
+<<<<<<< HEAD
         setCurrentUser((previousUser) => {
           const updated = {
             id: accId,
@@ -110,13 +144,36 @@ export default function Home() {
 
     void loadSavedUser();
   }, [fetchLatestBalance]);
+=======
+        const updated = {
+          id: accId,
+          holderName: data.holderName || (currentUser ? currentUser.holderName : "Member"),
+          email: data.email,
+          balance: Number(data.balance),
+          currency: data.currency || "LKR",
+          status: data.status || "ACTIVE",
+        };
+        setCurrentUser(updated);
+        localStorage.setItem("@phoenix_session_user", JSON.stringify(updated));
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  };
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingAuth(true);
     setAuthMsg(null);
     try {
+<<<<<<< HEAD
       const res = await fetch(apiUrl("/accounts/login"), {
+=======
+      const res = await fetch("http://localhost:8000/api/accounts/login", {
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier: loginIdentifier, password: loginPassword }),
@@ -126,8 +183,13 @@ export default function Home() {
       setCurrentUser(data);
       localStorage.setItem("@phoenix_session_user", JSON.stringify(data));
       setAuthMsg("Login successful!");
+<<<<<<< HEAD
       } catch (err: unknown) {
         setAuthMsg(err instanceof Error ? err.message : "Login failed.");
+=======
+    } catch (err: any) {
+      setAuthMsg(err.message);
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -145,7 +207,11 @@ export default function Home() {
     }
 
     try {
+<<<<<<< HEAD
       const res = await fetch(apiUrl("/accounts/register"), {
+=======
+      const res = await fetch("http://localhost:8000/api/accounts/register", {
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -155,6 +221,7 @@ export default function Home() {
           currency: "LKR",
         }),
       });
+<<<<<<< HEAD
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         const errMsg = Array.isArray(errorData.message)
@@ -167,6 +234,14 @@ export default function Home() {
       localStorage.setItem("@phoenix_session_user", JSON.stringify(newAcc));
     } catch (err: unknown) {
       setAuthMsg(err instanceof Error ? err.message : "Registration failed.");
+=======
+      if (!res.ok) throw new Error("Registration failed.");
+      const newAcc = await res.json();
+      setCurrentUser(newAcc);
+      localStorage.setItem("@phoenix_session_user", JSON.stringify(newAcc));
+    } catch (err: any) {
+      setAuthMsg(err.message);
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -183,7 +258,11 @@ export default function Home() {
     setIsTransferring(true);
 
     try {
+<<<<<<< HEAD
       const res = await fetch(apiUrl("/payments/transfer"), {
+=======
+      const res = await fetch("http://localhost:8000/api/payments/transfer", {
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -208,8 +287,13 @@ export default function Home() {
       setAmount("");
       setRecipient("");
       alert("Transfer Initiated Successfully");
+<<<<<<< HEAD
     } catch (err: unknown) {
       alert("Error: " + (err instanceof Error ? err.message : "Transfer request failed"));
+=======
+    } catch (err: any) {
+      alert("Error: " + err.message);
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     } finally {
       setIsTransferring(false);
     }
@@ -269,7 +353,11 @@ export default function Home() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
             <h3 className="lp-card-title">Zero-Trust Vault</h3>
+<<<<<<< HEAD
               <p className="lp-card-desc">Advanced key management featuring Shamir&apos;s Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault dynamic provisioning.</p>
+=======
+            <p className="lp-card-desc">Advanced key management featuring Shamir's Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault dynamic provisioning.</p>
+>>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
           </div>
         </section>
 
