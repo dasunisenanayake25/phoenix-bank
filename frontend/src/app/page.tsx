@@ -295,19 +295,19 @@ export default function Home() {
         {/* Easy Actions */}
         <div className="actions-grid">
           <div className="action-btn" onClick={() => setShowTransferModal(true)}>
-            <div className="action-icon">💸</div>
+            <div className="action-icon">Tr</div>
             <span className="action-label">Transfer</span>
           </div>
           <div className="action-btn" onClick={() => setShowBillsModal(true)}>
-            <div className="action-icon">🧾</div>
+            <div className="action-icon">Bi</div>
             <span className="action-label">Pay Bills</span>
           </div>
           <div className="action-btn">
-            <div className="action-icon">📷</div>
+            <div className="action-icon">Sc</div>
             <span className="action-label">Scan Pay</span>
           </div>
           <div className="action-btn" onClick={() => setShowCardsModal(true)}>
-            <div className="action-icon">💳</div>
+            <div className="action-icon">Wa</div>
             <span className="action-label">Wallet</span>
           </div>
         </div>
