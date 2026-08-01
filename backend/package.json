@@ -31,10 +31,7 @@
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-<<<<<<< HEAD
-=======
     "shamirs-secret-sharing": "^2.0.1",
->>>>>>> 68a2d6c02c964faad59ad73411bf680c32d82355
     "typeorm": "^1.1.0"
   },
   "devDependencies": {
