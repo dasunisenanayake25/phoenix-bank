@@ -7,22 +7,9 @@ import { OutboxPublisherService } from './outbox/outbox-publisher.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(helmet());
-  app.enableCors({
-    origin: (process.env.CORS_ORIGINS ?? 'http://localhost:3000').split(','),
-    credentials: true,
-  });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  app.enableCors();
 
-  const kafkaBrokers = (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(
-    ',',
-  );
+  // Configure Kafka Consumer
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
     options: {
@@ -42,4 +29,7 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Accounts Microservice is running on port ${port}`);
 }
-void bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

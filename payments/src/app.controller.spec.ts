@@ -11,9 +11,9 @@ describe('AppController', () => {
         {
           provide: 'KAFKA_SERVICE',
           useValue: {
+            emit: jest.fn(),
             subscribeToResponseOf: jest.fn(),
             connect: jest.fn(),
-            emit: jest.fn(),
           },
         },
       ],
@@ -22,7 +22,14 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  it('should be defined', () => {
-    expect(appController).toBeDefined();
+  describe('root', () => {
+    it('should validate amount', () => {
+      const req = { user: { id: '1', name: 'Test' }, headers: {} };
+      const result = appController.transferFunds(
+        { fromAccountId: 1, toAccountId: 2, amount: 0 },
+        req,
+      );
+      expect(result.status).toBe('error');
+    });
   });
 });
