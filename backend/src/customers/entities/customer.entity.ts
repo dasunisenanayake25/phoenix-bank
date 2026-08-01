@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Account } from '../../accounts/entities/account.entity';
 
 export enum KycStatus {
@@ -24,13 +31,18 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   address: string;
 
-  @Column({ name: 'kyc_status', type: 'enum', enum: KycStatus, default: KycStatus.PENDING })
+  @Column({
+    name: 'kyc_status',
+    type: 'enum',
+    enum: KycStatus,
+    default: KycStatus.PENDING,
+  })
   kycStatus: KycStatus;
 
   @Column({ name: 'tax_id', type: 'varchar', length: 50, nullable: true })
   taxId: string;
 
-  @OneToMany(() => Account, account => account.customer)
+  @OneToMany(() => Account, (account) => account.customer)
   accounts: Account[];
 
   @CreateDateColumn({ name: 'created_at' })

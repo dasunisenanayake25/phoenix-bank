@@ -36,16 +36,17 @@ describe('KeyCeremonyService', () => {
   it('should fail with less than 3 shares', () => {
     const masterKey = crypto.randomBytes(32);
     const shares = sss.split(masterKey, { shares: 5, threshold: 3 });
-    const shareHexes = [
-      shares[0].toString('hex'),
-      shares[1].toString('hex'),
-    ];
+    const shareHexes = [shares[0].toString('hex'), shares[1].toString('hex')];
 
-    expect(() => service.reconstructAndSign(shareHexes)).toThrow(BadRequestException);
+    expect(() => service.reconstructAndSign(shareHexes)).toThrow(
+      BadRequestException,
+    );
   });
 
   it('should fail with invalid shares', () => {
     const shareHexes = ['invalid1', 'invalid2', 'invalid3'];
-    expect(() => service.reconstructAndSign(shareHexes)).toThrow(BadRequestException);
+    expect(() => service.reconstructAndSign(shareHexes)).toThrow(
+      BadRequestException,
+    );
   });
 });
