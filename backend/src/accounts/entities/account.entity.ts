@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',
@@ -14,10 +14,10 @@ export enum AccountType {
 
 @Entity('accounts')
 export class Account {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar', { length: 64 })
   id: string;
 
-  @Column({ name: 'customer_id', type: 'uuid' })
+  @Column({ name: 'customer_id', type: 'varchar', length: 64, nullable: true })
   customerId: string;
 
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.00 })

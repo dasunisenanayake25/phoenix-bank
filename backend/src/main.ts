@@ -20,6 +20,8 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 4001;
+  await app.listen(port);
+  console.log(`Accounts Microservice is running on port ${port}`);
 }
 bootstrap();

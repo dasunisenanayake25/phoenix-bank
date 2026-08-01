@@ -15,9 +15,9 @@ import { AccountsModule } from './accounts/accounts.module';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
+        port: configService.get<number>('DB_PORT', 5433),
         username: configService.get<string>('DB_USER', 'postgres'),
-        password: configService.get<string>('DB_PASSWORD', 'postgrespassword'),
+        password: configService.get<string>('DB_PASSWORD', 'Rate2002#@maths'),
         database: configService.get<string>('DB_NAME', 'phoenix_ledger'),
         autoLoadEntities: true,
         synchronize: true, // Development only!
