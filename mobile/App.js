@@ -110,7 +110,6 @@ export default function App() {
       await AsyncStorage.setItem('@phoenix_session_user', JSON.stringify(user));
       Alert.alert('Success', `Welcome back, ${user.holderName}!`);
     } catch (err) {
-      // Fallback offline login for demo
       const fallbackUser = { id: loginIdentifier, holderName: `Member #${loginIdentifier}`, balance: 150000.0, currency: 'LKR' };
       setCurrentUser(fallbackUser);
       Alert.alert('Offline Mode', `Logged in locally as Account #${loginIdentifier}`);
@@ -146,7 +145,7 @@ export default function App() {
       const newAcc = await res.json();
       setCurrentUser(newAcc);
       await AsyncStorage.setItem('@phoenix_session_user', JSON.stringify(newAcc));
-      Alert.alert('Success', `🎉 Account Created! Welcome ${newAcc.holderName}`);
+      Alert.alert('Success', `Account Created! Welcome ${newAcc.holderName}`);
     } catch (err) {
       Alert.alert('Error', err.message || 'Server error during registration.');
     } finally {
@@ -192,7 +191,7 @@ export default function App() {
       };
       setTransactions((prev) => [newTx, ...prev]);
 
-      Alert.alert('Success', '🎉 Transfer initiated successfully via Kafka!');
+      Alert.alert('Success', 'Transfer initiated successfully via Kafka!');
       
       const newBal = currentUser.balance - numAmount;
       const updatedUser = { ...currentUser, balance: newBal };
@@ -222,13 +221,13 @@ export default function App() {
               style={[styles.authTabBtn, authTab === 'login' && styles.authTabActive]} 
               onPress={() => setAuthTab('login')}
             >
-              <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>🔑 Login</Text>
+              <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.authTabBtn, authTab === 'register' && styles.authTabActive]} 
               onPress={() => setAuthTab('register')}
             >
-              <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>📝 Register</Text>
+              <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>Register</Text>
             </TouchableOpacity>
           </View>
 
@@ -324,7 +323,7 @@ export default function App() {
         {/* Offline Banner */}
         {isOffline && (
           <View style={styles.offlineBanner}>
-            <Text style={styles.offlineText}>⚠️ Offline Mode - Showing Cached Data</Text>
+            <Text style={styles.offlineText}>Offline Mode - Showing Cached Data</Text>
           </View>
         )}
 
@@ -333,7 +332,7 @@ export default function App() {
           <View style={styles.balanceHeader}>
             <Text style={styles.balanceLabel}>TOTAL BALANCE</Text>
             <TouchableOpacity onPress={() => fetchLatestBalance(currentUser.id)} style={styles.refreshBtn}>
-              <Text style={styles.refreshBtnText}>↻ Refresh</Text>
+              <Text style={styles.refreshBtnText}>Refresh</Text>
             </TouchableOpacity>
           </View>
 
@@ -351,17 +350,14 @@ export default function App() {
         {/* Quick Action Buttons */}
         <View style={styles.actionsRow}>
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowTransferModal(true)}>
-            <Text style={styles.actionBtnIcon}>💸</Text>
             <Text style={styles.actionBtnText}>Send Money</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowBillsModal(true)}>
-            <Text style={styles.actionBtnIcon}>📑</Text>
             <Text style={styles.actionBtnText}>Pay Bills</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionBtn} onPress={() => setShowCardsModal(true)}>
-            <Text style={styles.actionBtnIcon}>💳</Text>
             <Text style={styles.actionBtnText}>Cards</Text>
           </TouchableOpacity>
         </View>
@@ -391,7 +387,7 @@ export default function App() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Send Money</Text>
               <TouchableOpacity onPress={() => setShowTransferModal(false)}>
-                <Text style={styles.closeBtn}>✕</Text>
+                <Text style={styles.closeBtn}>X</Text>
               </TouchableOpacity>
             </View>
 
@@ -432,7 +428,7 @@ export default function App() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Virtual Debit Card</Text>
               <TouchableOpacity onPress={() => setShowCardsModal(false)}>
-                <Text style={styles.closeBtn}>✕</Text>
+                <Text style={styles.closeBtn}>X</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.virtualCard}>
@@ -625,10 +621,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
     elevation: 1,
-  },
-  actionBtnIcon: {
-    fontSize: 20,
-    marginBottom: 4,
   },
   actionBtnText: {
     color: '#0077b6',

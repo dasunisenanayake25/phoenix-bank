@@ -68,7 +68,7 @@ def secret_to_string(num: int) -> str:
 
 def perform_key_ceremony():
     print("===============================================================")
-    print("      🔐 PHOENIXBANK MASTER KEY CEREMONY (PHASE 7)")
+    print("      PHOENIXBANK MASTER KEY CEREMONY (PHASE 7)")
     print("===============================================================")
     print("Generating 256-bit Master Key split into a 3-of-5 Threshold Scheme...\n")
 
@@ -77,7 +77,7 @@ def perform_key_ceremony():
     
     shares = split_secret(secret_int, k=3, n=5)
 
-    print("🔑 MASTER KEY SHARES GENERATED (Provide 3 to Key Custodians):\n")
+    print("MASTER KEY SHARES GENERATED (Provide 3 to Key Custodians):\n")
     formatted_shares = []
     for index, (x, y) in enumerate(shares, start=1):
         share_str = f"{x}:{y}"
@@ -85,7 +85,7 @@ def perform_key_ceremony():
         print(f"  Share #{index} (Custodian {index}): {share_str}")
 
     print("\n---------------------------------------------------------------")
-    print("⚠️  Security Policy: Store each share with a separate Key Custodian.")
+    print("Security Policy: Store each share with a separate Key Custodian.")
     print("   Minimum 3 shares required to unseal HashiCorp Vault secrets.")
     print("===============================================================\n")
 
@@ -95,10 +95,10 @@ def perform_key_ceremony():
 
 def reconstruct_and_unseal(provided_shares_list):
     print("===============================================================")
-    print("      🔓 PHOENIXBANK KEY RECONSTRUCTION & UNSEAL")
+    print("      PHOENIXBANK KEY RECONSTRUCTION & UNSEAL")
     print("===============================================================")
     if len(provided_shares_list) < 3:
-        print("❌ Error: Minimum 3 key shares are required!")
+        print("Error: Minimum 3 key shares are required!")
         return
 
     parsed_shares = []
@@ -109,9 +109,9 @@ def reconstruct_and_unseal(provided_shares_list):
     recovered_int = recover_secret(parsed_shares)
     try:
         recovered_key = secret_to_string(recovered_int)
-        print(f"✅ RECONSTRUCTED MASTER KEY: {recovered_key}\n")
+        print(f"RECONSTRUCTED MASTER KEY: {recovered_key}\n")
     except Exception as e:
-        print(f"❌ Failed to reconstruct key: {e}")
+        print(f"Failed to reconstruct key: {e}")
         return
 
     # Attempt to store provisioned secret into HashiCorp Vault
@@ -127,7 +127,7 @@ def reconstruct_and_unseal(provided_shares_list):
     try:
         res = requests.post(vault_url, headers=headers, json=payload, timeout=3)
         if res.status_code in (200, 204):
-            print("🔐 HashiCorp Vault Provisioned & Unsealed Successfully!")
+            print("HashiCorp Vault Provisioned & Unsealed Successfully!")
         else:
             print(f"Vault Response ({res.status_code}): {res.text}")
     except Exception as err:

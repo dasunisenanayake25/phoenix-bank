@@ -1,4 +1,4 @@
-# 🚀 PhoenixBank
+# PhoenixBank
 
 > **A Resilient, Zero-Trust Digital Banking Platform**
 
@@ -6,7 +6,7 @@ Rebuilding trusted digital finance with an isolated microservices architecture, 
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 PhoenixBank is built using a **Microservices Architecture** with isolated failure domains, ensuring no single compromised service can cascade into a total network shutdown.
 
@@ -48,7 +48,7 @@ PhoenixBank is built using a **Microservices Architecture** with isolated failur
 
 ---
 
-## 🛡️ Security & Zero-Trust Best Practices
+## Security & Zero-Trust Best Practices
 
 - **Zero-Trust Access**: All client applications route strictly through the Kong API Gateway (`http://localhost:8000`). Direct microservice exposure is blocked in production.
 - **Threshold Cryptography**: Root Master Key is governed by a 3-of-5 Shamir's Secret Sharing scheme (`security/key_ceremony.py`). No single administrator holds full system access.
@@ -56,7 +56,7 @@ PhoenixBank is built using a **Microservices Architecture** with isolated failur
 
 ---
 
-## 🚀 How to Run the Project Locally
+## How to Run the Project Locally
 
 ### 1. Start Infrastructure (Docker)
 Ensure Docker Desktop is running:
@@ -113,10 +113,10 @@ python security/key_ceremony.py --unseal <share1> <share2> <share3>
 
 ---
 
-## 🔮 Completed Roadmap
+## Completed Roadmap
 
-- **✅ Phase 1 - 3**: Accounts, Next.js Frontend, Payments Microservice (Kafka)
-- **✅ Phase 4**: Kong API Gateway & Zero-Trust Rate Limiting
-- **✅ Phase 5**: Offline-first React Native mobile app with AsyncStorage
-- **✅ Phase 6**: Python AI/ML Anomaly & Fraud Detection Engine (IsolationForest)
-- **✅ Phase 7**: Master Key Ceremony (3-of-5 Shamir's Secret Sharing) & HashiCorp Vault Integration
+- **Phase 1 - 3 [DONE]**: Accounts, Next.js Frontend, Payments Microservice (Kafka)
+- **Phase 4 [DONE]**: Kong API Gateway & Zero-Trust Rate Limiting
+- **Phase 5 [DONE]**: Offline-first React Native mobile app with AsyncStorage
+- **Phase 6 [DONE]**: Python AI/ML Anomaly & Fraud Detection Engine (IsolationForest)
+- **Phase 7 [DONE]**: Master Key Ceremony (3-of-5 Shamir's Secret Sharing) & HashiCorp Vault Integration

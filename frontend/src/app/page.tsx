@@ -154,7 +154,7 @@ export default function Home() {
       const newAcc = await res.json();
       setCurrentUser(newAcc);
       localStorage.setItem("@phoenix_session_user", JSON.stringify(newAcc));
-      setAuthMsg("🎉 Registration successful! Account created.");
+      setAuthMsg("Registration successful! Account created.");
     } catch (err: any) {
       setAuthMsg(`Registration Error: ${err.message}`);
     } finally {
@@ -201,7 +201,7 @@ export default function Home() {
         throw new Error("Transfer failed. Please check network/Kong gateway.");
       }
 
-      setTransferMsg("🎉 Transfer initiated successfully via Kafka!");
+      setTransferMsg("Transfer initiated successfully via Kafka!");
       
       const newTx: Transaction = {
         id: Date.now().toString(),
@@ -247,7 +247,7 @@ export default function Home() {
                 cursor: "pointer",
               }}
             >
-              🔑 Member Login
+              Member Login
             </button>
             <button
               onClick={() => { setAuthTab("register"); setAuthMsg(null); }}
@@ -262,7 +262,7 @@ export default function Home() {
                 cursor: "pointer",
               }}
             >
-              📝 Register New Member
+              Register New Member
             </button>
           </div>
 
@@ -351,7 +351,7 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <h1>PhoenixBank</h1>
           <span style={{ fontSize: "0.8rem", padding: "0.2rem 0.6rem", borderRadius: "12px", background: "#e6fcf5", color: "#0ca678", fontWeight: "bold" }}>
-            ● Active
+            Active
           </span>
         </div>
         <div className="header-user">
@@ -402,7 +402,7 @@ export default function Home() {
                   fontWeight: "bold"
                 }}
               >
-                ↻ Refresh
+                Refresh
               </button>
             </div>
             {loading ? (
@@ -420,13 +420,13 @@ export default function Home() {
           {/* Quick Action Buttons */}
           <div className="actions-grid">
             <div className="action-btn" onClick={() => setShowTransferModal(true)}>
-              💸 Send Money
+              Send Money
             </div>
             <div className="action-btn" onClick={() => setShowBillsModal(true)}>
-              📑 Pay Bills
+              Pay Bills
             </div>
             <div className="action-btn" onClick={() => setShowCardsModal(true)}>
-              💳 Cards
+              Cards
             </div>
           </div>
 
@@ -511,7 +511,7 @@ export default function Home() {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Send Money (Kafka Event)</h3>
-                <button className="close-btn" onClick={() => setShowTransferModal(false)}>✕</button>
+                <button className="close-btn" onClick={() => setShowTransferModal(false)}>X</button>
               </div>
               <form onSubmit={handleSendMoney}>
                 <div className="form-group">
@@ -539,7 +539,7 @@ export default function Home() {
                   />
                 </div>
                 {transferMsg && (
-                  <div style={{ padding: "0.75rem", borderRadius: "8px", background: transferMsg.includes("🎉") ? "#e6fcf5" : "#fff5f5", color: transferMsg.includes("🎉") ? "#0ca678" : "#e03131", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                  <div style={{ padding: "0.75rem", borderRadius: "8px", background: transferMsg.includes("Error") ? "#fff5f5" : "#e6fcf5", color: transferMsg.includes("Error") ? "#e03131" : "#0ca678", fontSize: "0.85rem", marginBottom: "1rem" }}>
                     {transferMsg}
                   </div>
                 )}
@@ -557,12 +557,12 @@ export default function Home() {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Pay Utility Bills</h3>
-                <button className="close-btn" onClick={() => setShowBillsModal(false)}>✕</button>
+                <button className="close-btn" onClick={() => setShowBillsModal(false)}>X</button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
-                <button className="bill-opt" onClick={() => { alert("Electricity Bill Paid!"); setShowBillsModal(false); }}>⚡ CEB Electricity</button>
-                <button className="bill-opt" onClick={() => { alert("Water Bill Paid!"); setShowBillsModal(false); }}>💧 National Water Board</button>
-                <button className="bill-opt" onClick={() => { alert("Telecom Bill Paid!"); setShowBillsModal(false); }}>📞 Dialog / Mobitel Bill</button>
+                <button className="bill-opt" onClick={() => { alert("Electricity Bill Paid!"); setShowBillsModal(false); }}>CEB Electricity</button>
+                <button className="bill-opt" onClick={() => { alert("Water Bill Paid!"); setShowBillsModal(false); }}>National Water Board</button>
+                <button className="bill-opt" onClick={() => { alert("Telecom Bill Paid!"); setShowBillsModal(false); }}>Dialog / Mobitel Bill</button>
               </div>
             </div>
           </div>
@@ -574,7 +574,7 @@ export default function Home() {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Your PhoenixBank Card</h3>
-                <button className="close-btn" onClick={() => setShowCardsModal(false)}>✕</button>
+                <button className="close-btn" onClick={() => setShowCardsModal(false)}>X</button>
               </div>
               <div className="virtual-card">
                 <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>PhoenixBank Debit</div>
@@ -594,7 +594,7 @@ export default function Home() {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Instant Personal Loan</h3>
-                <button className="close-btn" onClick={() => setShowLoanModal(false)}>✕</button>
+                <button className="close-btn" onClick={() => setShowLoanModal(false)}>X</button>
               </div>
               <p style={{ margin: "1rem 0", fontSize: "0.95rem" }}>
                 Pre-approved loan up to <strong>LKR 500,000.00</strong> at a promotional rate of 9.5% p.a.
