@@ -91,5 +91,23 @@ Press `w` in the terminal to view in your web browser, or scan the QR code with 
 - **✅ Phase 1 - 3**: Accounts, Next.js Frontend, Payments Microservice (Kafka)
 - **✅ Phase 4**: Kong API Gateway & Zero-Trust Routing.
 - **✅ Phase 5**: Offline-first React Native mobile app.
-- **⏳ Phase 6**: Deploy Python AI/ML Anomaly & Fraud Detection Engine.
-- **⏳ Phase 7**: Master Key Ceremony & HashiCorp Vault Integration.
+- **✅ Phase 6**: Python AI/ML Anomaly & Fraud Detection Engine (`fraud-detection/`).
+- **✅ Phase 7**: Master Key Ceremony (3-of-5 Shamir's Secret Sharing in `security/key_ceremony.py`) & HashiCorp Vault Integration.
+
+---
+
+### 🛡️ 6. Start the AI/ML Fraud Detection Engine (Terminal 5)
+```bash
+cd fraud-detection
+pip install -r requirements.txt
+python main.py
+```
+*(Runs on `http://localhost:5000` & routes via Kong Gateway on `/api/fraud`)*
+
+### 🔐 7. Run Master Key Ceremony & Vault Unseal
+Ensure HashiCorp Vault is running in Docker (`docker compose up -d`).
+```bash
+python security/key_ceremony.py --generate
+python security/key_ceremony.py --unseal <share1> <share2> <share3>
+```
+
