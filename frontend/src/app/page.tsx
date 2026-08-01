@@ -26,8 +26,8 @@ export default function Home() {
 
   // Auth Screen state
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
-  const [loginIdentifier, setLoginIdentifier] = useState("1");
-  const [loginPassword, setLoginPassword] = useState("123");
+  const [loginIdentifier, setLoginIdentifier] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
