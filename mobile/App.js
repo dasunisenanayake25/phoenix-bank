@@ -20,14 +20,13 @@ export default function App() {
 
   // Auth Screen State
   const [authTab, setAuthTab] = useState('login');
-  const [loginIdentifier, setLoginIdentifier] = useState('1');
-  const [loginPassword, setLoginPassword] = useState('123');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
-  const [regDeposit, setRegDeposit] = useState('25000');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
   // Feature Modals
@@ -128,12 +127,6 @@ export default function App() {
       return;
     }
 
-    const numDeposit = parseFloat(regDeposit);
-    if (isNaN(numDeposit) || numDeposit < 0) {
-      Alert.alert('Invalid Deposit', 'Please enter a valid deposit amount.');
-      return;
-    }
-
     setIsSubmittingAuth(true);
     try {
       const res = await fetch(`${API_BASE_URL}/api/accounts/register`, {
@@ -143,7 +136,6 @@ export default function App() {
           name: regName,
           email: regEmail,
           password: regPassword,
-          initialDeposit: numDeposit,
           currency: 'LKR',
         }),
       });
@@ -260,18 +252,7 @@ export default function App() {
                 placeholder="Enter password"
               />
 
-              <Text style={{ fontSize: 12, color: '#6c757d', marginBottom: 8 }}>Quick Accounts (Pass: 123):</Text>
-              <View style={{ flexDirection: 'row', gap: 6, marginBottom: 16 }}>
-                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('1'); setLoginPassword('123'); }}>
-                  <Text style={styles.quickChipText}>Acc 1 (User)</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('2'); setLoginPassword('123'); }}>
-                  <Text style={styles.quickChipText}>Acc 2 (Amila)</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.quickChip} onPress={() => { setLoginIdentifier('3'); setLoginPassword('123'); }}>
-                  <Text style={styles.quickChipText}>Acc 3 (Kamal)</Text>
-                </TouchableOpacity>
-              </View>
+
 
               <TouchableOpacity style={styles.submitBtn} onPress={handleLogin} disabled={isSubmittingAuth}>
                 <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Authenticating...' : 'Login'}</Text>
@@ -314,14 +295,7 @@ export default function App() {
                 placeholder="Confirm password"
               />
 
-              <Text style={styles.inputLabel}>Initial Deposit (LKR)</Text>
-              <TextInput
-                style={styles.input}
-                value={regDeposit}
-                onChangeText={setRegDeposit}
-                keyboardType="numeric"
-                placeholder="25000"
-              />
+
 
               <TouchableOpacity style={styles.submitBtn} onPress={handleRegister} disabled={isSubmittingAuth}>
                 <Text style={styles.submitBtnText}>{isSubmittingAuth ? 'Creating...' : 'Register Account'}</Text>
