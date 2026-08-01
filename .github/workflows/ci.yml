@@ -2,9 +2,9 @@ name: PhoenixBank CI
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["main", "master", "feature/production-security-hardening"]
   pull_request:
-    branches: ["main", "master"]
+    branches: ["main", "master", "feature/production-security-hardening"]
 
 concurrency:
   group: phoenixbank-ci-${{ github.ref }}

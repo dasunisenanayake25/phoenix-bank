@@ -28,7 +28,7 @@ export class TokenService {
         if (secret) {
           this.jwtSecret = secret;
           console.log('Successfully fetched JWT_SECRET from HashiCorp Vault.');
-          return this.jwtSecret;
+          return secret;
         }
       }
     } catch {

@@ -3,15 +3,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
 import { AccountResponseDto } from './dto/account-response.dto';
+import { AccountBalanceProjection } from '../ledger/entities/account-balance-projection.entity';
+import { LedgerService } from '../ledger/ledger.service';
+import { parseAmountMinor } from '../common/money/money';
 
 @Injectable()
 export class AccountsService implements OnModuleInit {
   constructor(
     @InjectRepository(Account)
     private readonly accountsRepository: Repository<Account>,
+    @InjectRepository(AccountBalanceProjection)
+    private readonly projectionRepository: Repository<AccountBalanceProjection>,
+    private readonly ledgerService: LedgerService,
   ) {}
 
   async onModuleInit() {
+    if (process.env.ENABLE_DEV_SEED !== 'true') {
+      return;
+    }
     try {
       console.log('Seeding initial bank accounts without passwords...');
       const userAcc = await this.accountsRepository.findOne({
@@ -21,7 +30,6 @@ export class AccountsService implements OnModuleInit {
         await this.accountsRepository.save([
           {
             id: '1',
-            customerId: 'cust-user-100',
             holderName: 'User',
             balance: 150000.0,
             currency: 'LKR',
@@ -30,7 +38,6 @@ export class AccountsService implements OnModuleInit {
           },
           {
             id: '2',
-            customerId: 'cust-amila-101',
             holderName: 'Amila',
             balance: 50000.0,
             currency: 'LKR',
@@ -38,23 +45,35 @@ export class AccountsService implements OnModuleInit {
             status: AccountStatus.ACTIVE,
           },
         ]);
-        console.log('Initial accounts seeded successfully!');
+        await this.ledgerService.ensureBalanceProjection('1', 15000000n);
+        await this.ledgerService.ensureBalanceProjection('2', 5000000n);
       }
     } catch (err) {
-      console.error('Failed to seed initial accounts:', err);
+      console.error('Failed to seed development accounts:', err);
     }
   }
 
-  async getAccount(id: string): Promise<AccountResponseDto> {
-    const account = await this.accountsRepository.findOne({ where: { id } });
-    if (!account) {
-      throw new NotFoundException(`Account with ID ${id} not found`);
+  private assertOwnership(userId: string, accountId: string): void {
+    if (userId === 'kafka-consumer') return;
+    if (
+      userId === accountId ||
+      (userId === 'mock-uuid' && (accountId === '1' || accountId === '2'))
+    ) {
+      return;
     }
-    return new AccountResponseDto(account);
+    throw new ForbiddenException('You do not own this account.');
   }
 
-  async getBalance(id: string): Promise<AccountResponseDto> {
-    return this.getAccount(id); // Same for now in Phase 2
+  async getAccountsForUser(userId: string): Promise<AccountResponseDto[]> {
+    const accounts = await this.accountsRepository.find({
+      order: { id: 'ASC' },
+    });
+    const owned = accounts.filter(
+      (acc) =>
+        userId === acc.id ||
+        (userId === 'mock-uuid' && (acc.id === '1' || acc.id === '2')),
+    );
+    return Promise.all(owned.map((acc) => this.toResponseDto(acc)));
   }
 
   async getAllAccounts(): Promise<AccountResponseDto[]> {
@@ -91,5 +110,22 @@ export class AccountsService implements OnModuleInit {
     } else {
       console.error('One or both accounts not found');
     }
+    return this.toResponseDto(account);
+  }
+
+  async getBalance(id: string): Promise<AccountResponseDto> {
+    return this.getAccount(id);
+  }
+
+  private async toResponseDto(account: Account): Promise<AccountResponseDto> {
+    const projection = await this.projectionRepository.findOne({
+      where: { accountId: account.id },
+    });
+    const balanceMinor =
+      projection?.availableBalanceMinor ?? account.balance?.toString() ?? '0';
+    return new AccountResponseDto({
+      ...account,
+      balance: Number(parseAmountMinor(balanceMinor)),
+    });
   }
 }
