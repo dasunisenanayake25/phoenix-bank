@@ -309,15 +309,6 @@ export default function Home() {
                 />
               </div>
 
-              <div style={{ marginBottom: "1.2rem" }}>
-                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block", marginBottom: "0.5rem" }}>Quick Demo Accounts (Password: 123):</span>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("1"); setLoginPassword("123"); }}>Acc 1 (User)</button>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("2"); setLoginPassword("123"); }}>Acc 2 (Amila)</button>
-                  <button type="button" className="bill-opt" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setLoginIdentifier("3"); setLoginPassword("123"); }}>Acc 3 (Kamal)</button>
-                </div>
-              </div>
-
               <button type="submit" className="submit-btn" disabled={isSubmittingAuth}>
                 {isSubmittingAuth ? "Authenticating..." : "Login to Account"}
               </button>
