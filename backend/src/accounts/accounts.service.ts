@@ -137,14 +137,24 @@ export class AccountsService implements OnModuleInit {
   }
 
   private async toResponseDto(account: Account): Promise<AccountResponseDto> {
-    const projection = await this.projectionRepository.findOne({
-      where: { accountId: account.id },
-    });
-    const balanceMinor =
-      projection?.availableBalanceMinor ?? account.balance?.toString() ?? '0';
+    try {
+      const projection = await this.projectionRepository.findOne({
+        where: { accountId: account.id },
+      });
+      if (projection?.availableBalanceMinor) {
+        const balanceMinor = parseAmountMinor(projection.availableBalanceMinor);
+        return new AccountResponseDto({
+          ...account,
+          balance: Number(balanceMinor) / 100,
+        });
+      }
+    } catch {
+      // projection table may not exist or balance parse failed — fall through
+    }
     return new AccountResponseDto({
       ...account,
-      balance: Number(parseAmountMinor(balanceMinor)),
+      balance: Number(account.balance),
     });
   }
 }
+
