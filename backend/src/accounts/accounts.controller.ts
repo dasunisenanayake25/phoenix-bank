@@ -1,11 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { AccountsService } from './accounts.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
 
-@Controller('api/v1/me/accounts')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('api/accounts')
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 

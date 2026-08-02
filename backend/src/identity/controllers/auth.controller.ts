@@ -9,20 +9,20 @@ import { AuthService } from '../services/auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
-@Controller(['api/v1/auth', 'api/v1/accounts'])
+@Controller('api/accounts')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() body: any) {
+  register(@Body() body: { name?: string; email?: string; password?: string; currency?: string }) {
     return this.authService.register({
-      email: body.email || body.identifier || 'test@example.com',
+      email: body.email || 'test@example.com',
       password: body.password || 'password123',
     });
   }
 
   @Post('login')
-  login(@Body() body: any) {
+  login(@Body() body: { identifier?: string; email?: string; password?: string }) {
     return this.authService.login({
       email: body.email || body.identifier || 'test@example.com',
       password: body.password || 'password123',
@@ -32,11 +32,6 @@ export class AuthController {
   @Post('logout')
   logout() {
     return { message: 'Logged out successfully' };
-  }
-
-  @Post('refresh')
-  refresh() {
-    return { message: 'Tokens refreshed' };
   }
 
   @UseGuards(JwtAuthGuard)

@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { AccountsService } from '../../accounts/accounts.service';
 
-@Controller(['api/v1/transfers', 'api/v1/payments'])
+@Controller('api/payments')
 export class TransfersController {
   constructor(private readonly accountsService: AccountsService) {}
 
-  @Post(['', 'transfer'])
+  @Post('transfer')
   async createTransfer(
     @Body() body: { fromAccountId?: string | number; toAccountId?: string | number; amount?: number },
   ) {
