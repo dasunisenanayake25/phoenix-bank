@@ -4,7 +4,10 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Customer } from '../../customers/entities/customer.entity';
 
 export enum AccountStatus {
   ACTIVE = 'ACTIVE',

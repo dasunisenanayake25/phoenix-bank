@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account, AccountType, AccountStatus } from './entities/account.entity';
@@ -64,6 +69,17 @@ export class AccountsService implements OnModuleInit {
     throw new ForbiddenException('You do not own this account.');
   }
 
+  async getAccount(id: string, userId?: string): Promise<AccountResponseDto> {
+    if (userId) {
+      this.assertOwnership(userId, id);
+    }
+    const account = await this.accountsRepository.findOne({ where: { id } });
+    if (!account) {
+      throw new NotFoundException(`Account #${id} not found`);
+    }
+    return this.toResponseDto(account);
+  }
+
   async getAccountsForUser(userId: string): Promise<AccountResponseDto[]> {
     const accounts = await this.accountsRepository.find({
       order: { id: 'ASC' },
@@ -80,7 +96,7 @@ export class AccountsService implements OnModuleInit {
     const accounts = await this.accountsRepository.find({
       order: { id: 'ASC' },
     });
-    return accounts.map((acc) => new AccountResponseDto(acc));
+    return Promise.all(accounts.map((acc) => this.toResponseDto(acc)));
   }
 
   async processTransfer(data: {
@@ -110,7 +126,10 @@ export class AccountsService implements OnModuleInit {
     } else {
       console.error('One or both accounts not found');
     }
-    return this.toResponseDto(account);
+    if (fromAccount) {
+      return this.toResponseDto(fromAccount);
+    }
+    return null;
   }
 
   async getBalance(id: string): Promise<AccountResponseDto> {

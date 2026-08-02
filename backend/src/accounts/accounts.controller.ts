@@ -7,31 +7,27 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @Controller('api/v1/me/accounts')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AccountsController {
-  constructor(
-    private readonly accountsService: AccountsService,
-    private readonly transfersService: TransfersService,
-  ) {}
+  constructor(private readonly accountsService: AccountsService) {}
 
   @Get()
   async getMyAccounts() {
-    // In a real DB, query accounts where customerId = user.id
-    // For demo, we just get all and filter (or pretend)
     return this.accountsService.getAllAccounts();
   }
 
+  @Get(':accountId')
   async getAccount(@Param('accountId') accountId: string) {
-    // Phase 2: Check account ownership (mock logic)
-    // if (account.customerId !== user.id) throw ForbiddenException...
     return this.accountsService.getAccount(accountId);
   }
 
+  @Get(':accountId/balance')
   async getBalance(@Param('accountId') accountId: string) {
     return this.accountsService.getBalance(accountId);
   }
 
-  getTransactions(@Param('accountId') accountId: string) {
-    console.log(accountId); // to avoid unused var
-    return []; // Placeholder for transactions
+  @Get(':accountId/transactions')
+  async getTransactions(@Param('accountId') accountId: string) {
+    console.log(accountId);
+    return [];
   }
 
   @EventPattern('transfer-initiated')

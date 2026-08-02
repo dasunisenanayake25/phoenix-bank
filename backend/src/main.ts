@@ -8,6 +8,9 @@ import { OutboxPublisherService } from './outbox/outbox-publisher.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  const kafkaBrokers = (process.env.KAFKA_BROKER_URL ?? 'localhost:9092').split(',');
 
   // Configure Kafka Consumer
   app.connectMicroservice<MicroserviceOptions>({
