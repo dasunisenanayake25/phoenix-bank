@@ -10,6 +10,6 @@ import { AuditModule } from '../audit/audit.module';
   imports: [TypeOrmModule.forFeature([FraudCase, Transfer]), AuditModule],
   controllers: [FraudAdminController],
   providers: [FraudEngineService],
-  exports: [FraudEngineService],
+  exports: [FraudEngineService, TypeOrmModule],
 })
 export class FraudModule {}

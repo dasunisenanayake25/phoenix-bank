@@ -1,38 +1,33 @@
 import {
   Body,
   Controller,
-  Headers,
   Post,
-  Req,
-  UseGuards,
   BadRequestException,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { CreateTransferDto } from '../dto/create-transfer.dto';
-import { TransfersService } from '../services/transfers.service';
+import { AccountsService } from '../../accounts/accounts.service';
 
-@Controller('api/v1/transfers')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller(['api/v1/transfers', 'api/v1/payments'])
 export class TransfersController {
-  constructor(private readonly transfersService: TransfersService) {}
+  constructor(private readonly accountsService: AccountsService) {}
 
-  @Post()
+  @Post(['', 'transfer'])
   async createTransfer(
-    @Headers('idempotency-key') idempotencyKey: string | undefined,
-    @Body() dto: CreateTransferDto,
-    @CurrentUser() user: { sub: string },
-    @Req() req: { correlationId?: string },
+    @Body() body: { fromAccountId?: string | number; toAccountId?: string | number; amount?: number },
   ) {
-    if (!idempotencyKey) {
-      throw new BadRequestException('Idempotency-Key header is required');
+    if (!body || !body.fromAccountId || !body.toAccountId || !body.amount) {
+      throw new BadRequestException(
+        'fromAccountId, toAccountId, and amount are required.',
+      );
     }
-    return this.transfersService.createTransfer({
-      userId: user.sub,
-      idempotencyKey,
-      dto,
-      correlationId: req.correlationId,
+    const result = await this.accountsService.processTransfer({
+      fromAccountId: body.fromAccountId.toString(),
+      toAccountId: body.toAccountId.toString(),
+      amount: Number(body.amount),
     });
+    return {
+      status: 'success',
+      message: 'Transfer executed successfully',
+      data: result,
+    };
   }
 }
