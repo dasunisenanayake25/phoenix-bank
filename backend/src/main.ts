@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
-import helmet from 'helmet';
 import { OutboxPublisherService } from './outbox/outbox-publisher.service';
 
 async function bootstrap() {
@@ -10,7 +9,9 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  const kafkaBrokers = (process.env.KAFKA_BROKER_URL ?? 'localhost:9092').split(',');
+  const kafkaBrokers = (process.env.KAFKA_BROKER_URL ?? 'localhost:9092').split(
+    ',',
+  );
 
   // Configure Kafka Consumer
   app.connectMicroservice<MicroserviceOptions>({

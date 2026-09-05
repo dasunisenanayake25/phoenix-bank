@@ -24,9 +24,7 @@ export class AuthService {
 
     return {
       id: '1',
-      holderName: registerDto.email
-        ? registerDto.email.split('@')[0]
-        : 'User',
+      holderName: registerDto.email ? registerDto.email.split('@')[0] : 'User',
       email: registerDto.email,
       balance: 150000.0,
       currency: 'LKR',

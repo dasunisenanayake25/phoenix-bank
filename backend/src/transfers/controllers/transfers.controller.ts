@@ -1,9 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  BadRequestException,
-} from '@nestjs/common';
+import { Body, Controller, Post, BadRequestException } from '@nestjs/common';
 import { AccountsService } from '../../accounts/accounts.service';
 
 @Controller('api/payments')
@@ -12,7 +7,12 @@ export class TransfersController {
 
   @Post('transfer')
   async createTransfer(
-    @Body() body: { fromAccountId?: string | number; toAccountId?: string | number; amount?: number },
+    @Body()
+    body: {
+      fromAccountId?: string | number;
+      toAccountId?: string | number;
+      amount?: number;
+    },
   ) {
     if (!body || !body.fromAccountId || !body.toAccountId || !body.amount) {
       throw new BadRequestException(

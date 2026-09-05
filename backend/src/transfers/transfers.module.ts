@@ -16,12 +16,7 @@ import { TransferLimitsPolicy } from './policies/transfer-limits.policy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Transfer,
-      IdempotencyRecord,
-      Account,
-      FraudCase,
-    ]),
+    TypeOrmModule.forFeature([Transfer, IdempotencyRecord, Account, FraudCase]),
     AccountsModule,
     LedgerModule,
     AuditModule,

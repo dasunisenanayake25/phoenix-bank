@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -14,7 +8,15 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() body: { name?: string; email?: string; password?: string; currency?: string }) {
+  register(
+    @Body()
+    body: {
+      name?: string;
+      email?: string;
+      password?: string;
+      currency?: string;
+    },
+  ) {
     return this.authService.register({
       email: body.email || 'test@example.com',
       password: body.password || 'password123',
@@ -22,7 +24,9 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() body: { identifier?: string; email?: string; password?: string }) {
+  login(
+    @Body() body: { identifier?: string; email?: string; password?: string },
+  ) {
     return this.authService.login({
       email: body.email || body.identifier || 'test@example.com',
       password: body.password || 'password123',
