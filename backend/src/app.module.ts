@@ -71,7 +71,7 @@ import { SafeHttpExceptionFilter } from './common/filters/safe-http-exception.fi
         return {
           type: 'postgres',
           host: configService.get<string>('DB_HOST', 'localhost'),
-          port: configService.get<number>('DB_PORT', 5433),
+          port: configService.get<number>('DB_PORT', 5434),
           username: configService.get<string>('DB_USER', 'postgres'),
           password: dbPassword,
           database: configService.get<string>('DB_NAME', 'phoenix_ledger'),
