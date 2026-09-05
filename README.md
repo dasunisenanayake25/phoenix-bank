@@ -27,6 +27,14 @@ PhoenixBank is an enterprise-grade, event-driven banking platform designed for m
   * Responsive Web App (Next.js) and Mobile App (React Native/Expo).
   * "PROSPERUM" inspired Dark Blue & Gold premium corporate UI.
 
+## Future Roadmap (Next Level DevOps)
+While the current architecture is production-ready, we have identified the following enhancements for scaling and enterprise-level observability:
+1. **Kubernetes (K8s) Migration**: Transitioning from Docker Compose to Helm Charts for automated orchestration, self-healing, and auto-scaling of the microservices.
+2. **Observability Stack**: Integrating Prometheus & Grafana for real-time monitoring of Kafka queue depths, AI Fraud Engine metrics, and Node.js performance.
+3. **Infrastructure as Code (IaC)**: Implementing Terraform scripts to automatically provision the required cloud infrastructure (VPCs, VM clusters, managed DBs).
+4. **Chaos Engineering & Load Testing**: Utilizing tools like k6 to simulate massive transaction spikes, ensuring the Kafka message bus gracefully handles high throughput.
+5. **Advanced API Gateway Configs**: Enforcing strict Rate Limiting and WAF (Web Application Firewall) IP restrictions at the Kong API Gateway level to mitigate DDoS attacks.
+
 ## Technology Stack
 
 | Domain | Technologies |
