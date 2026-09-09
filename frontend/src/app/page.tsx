@@ -264,8 +264,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="lp-hero">
           <div className="lp-hero-content">
-            <span className="lp-hero-pretitle">Financial Guidance You Can Trust</span>
-            <h1 className="lp-hero-title">Smart Financial Decisions for a Stronger Future</h1>
+            <h1 className="lp-hero-title">Achieve Financial Success & Security</h1>
             <p className="lp-hero-desc">
               Experience the next generation of banking with our Zero-Trust architecture. 
               Powered by event-driven microservices (Kafka), HashiCorp Vault threshold cryptography, 
@@ -273,7 +272,7 @@ export default function Home() {
             </p>
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
               <button className="lp-hero-btn" onClick={() => setShowAuthModal(true)}>
-                Schedule a Consultation
+                Access Account
               </button>
               <button className="lp-hero-btn" style={{ background: 'transparent', border: '1px solid white', color: 'white' }} onClick={() => window.scrollTo(0, 800)}>
                 Our Services &rarr;
@@ -413,43 +412,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="lp-testimonials">
-          <span className="lp-hero-pretitle" style={{ color: '#64748b' }}>What Our Clients Say</span>
-          <h2 className="lp-section-title">Trusted by Individuals and Businesses</h2>
-          <div className="test-grid">
-            <div className="test-card">
-              <p className="test-quote">"PhoenixBank took the time to understand our goals and created a plan that gave us confidence in our future."</p>
-              <div className="test-author">
-                <img src="https://i.pravatar.cc/150?u=1" alt="Melissa R." />
-                <div className="test-author-info">
-                  <h4>Melissa R.</h4>
-                  <p>New York, NY</p>
-                </div>
-              </div>
-            </div>
-            <div className="test-card">
-              <p className="test-quote">"Professional, knowledgeable, and always responsive. They've been instrumental in helping our business grow."</p>
-              <div className="test-author">
-                <img src="https://i.pravatar.cc/150?u=2" alt="James T." />
-                <div className="test-author-info">
-                  <h4>James T.</h4>
-                  <p>Chicago, IL</p>
-                </div>
-              </div>
-            </div>
-            <div className="test-card">
-              <p className="test-quote">"Their advice is clear, honest, and always in our best interest. We highly recommend their team."</p>
-              <div className="test-author">
-                <img src="https://i.pravatar.cc/150?u=3" alt="Sarah L." />
-                <div className="test-author-info">
-                  <h4>Sarah L.</h4>
-                  <p>Austin, TX</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Testimonials section removed as requested */}
 
         {/* Footer */}
         <footer style={{ background: '#0b213f', color: '#94a3b8', padding: '60px 5% 40px 5%', textAlign: 'center', borderTop: '1px solid #1e293b' }}>

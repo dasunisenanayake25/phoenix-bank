@@ -46,6 +46,19 @@ export default function PersonalBanking() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer style={{ background: '#0b213f', color: '#94a3b8', padding: '60px 5% 40px 5%', textAlign: 'center', borderTop: '1px solid #1e293b' }}>
+        <div style={{ marginBottom: '20px', fontSize: '24px', color: 'white', fontWeight: 'bold', letterSpacing: '2px', fontFamily: 'Georgia, serif' }}>PHOENIXBANK</div>
+        <p style={{ marginBottom: '10px' }}>Elevating your financial future with Zero-Trust security and intelligent insights.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '30px' }}>
+          <a href="/personal" style={{ color: '#cfa75c', textDecoration: 'none', fontSize: '14px' }}>Personal</a>
+          <a href="/business" style={{ color: '#cfa75c', textDecoration: 'none', fontSize: '14px' }}>Business</a>
+          <a href="/cards" style={{ color: '#cfa75c', textDecoration: 'none', fontSize: '14px' }}>Cards</a>
+          <a href="/about" style={{ color: '#cfa75c', textDecoration: 'none', fontSize: '14px' }}>About Us</a>
+        </div>
+        <p style={{ fontSize: '12px', opacity: 0.7 }}>&copy; 2026 PhoenixBank. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
