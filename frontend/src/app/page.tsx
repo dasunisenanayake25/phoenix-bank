@@ -495,7 +495,7 @@ export default function Home() {
 
   // Dashboard Screen
   return (
-    <div className="app-container">
+    <div>
       <header className="header">
         <div>
           <h1>PhoenixBank</h1>
