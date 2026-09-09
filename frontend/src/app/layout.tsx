@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: "A Resilient, Zero-Trust Digital Banking Platform",
 };
 
+import ThemeToggle from "./ThemeToggle";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,6 +19,7 @@ export default function RootLayout({
         <div className="app-container">
           <main>{children}</main>
         </div>
+        <ThemeToggle />
       </body>
     </html>
   );
