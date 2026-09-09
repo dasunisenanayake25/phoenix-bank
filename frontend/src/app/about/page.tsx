@@ -17,7 +17,7 @@ export default function AboutUs() {
       </nav>
 
       <div className="page-hero" style={{ 
-        backgroundImage: 'linear-gradient(rgba(11, 33, 63, 0.8), rgba(11, 33, 63, 0.8)), url("https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80")',
+        backgroundImage: 'linear-gradient(rgba(11, 33, 63, 0.6), rgba(11, 33, 63, 0.7)), url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '120px 5%',
