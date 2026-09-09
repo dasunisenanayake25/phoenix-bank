@@ -403,12 +403,12 @@ body {
 }
 
 /* ========================================= */
-/* Landing Page (PROSPERUM Style)            */
+/* Landing Page (Corporate White/Navy Theme) */
 /* ========================================= */
 .lp-container {
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #ffffff;
+  color: #0b213f;
 }
 
 .lp-navbar {
@@ -422,6 +422,7 @@ body {
   left: 0;
   right: 0;
   z-index: 50;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .lp-logo {
@@ -440,20 +441,21 @@ body {
   color: rgba(255,255,255,0.9);
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
   transition: color 0.2s;
 }
 
 .lp-nav-links a:hover {
-  color: #fbbf24;
+  color: #cfa75c;
 }
 
 .lp-login-btn {
-  background: #d97706; /* Gold/Mustard */
-  color: white;
+  background: #cfa75c; /* Soft Gold */
+  color: #0b213f;
   padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 4px;
+  font-weight: 700;
   font-size: 14px;
   border: none;
   cursor: pointer;
@@ -461,33 +463,36 @@ body {
 }
 
 .lp-login-btn:hover {
-  background: #b45309;
+  background: #e6c587;
 }
 
 /* Hero Section */
 .lp-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  padding: 180px 5% 120px 5%;
+  background: linear-gradient(rgba(11, 33, 63, 0.85), rgba(11, 33, 63, 0.85)), url('https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&q=80') center/cover;
+  padding: 200px 5% 150px 5%;
   position: relative;
-  overflow: hidden;
-}
-
-.lp-hero::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 100px;
-  background: linear-gradient(to top, #f8fafc, transparent);
+  text-align: center;
 }
 
 .lp-hero-content {
-  max-width: 800px;
+  max-width: 900px;
+  margin: 0 auto;
   position: relative;
   z-index: 2;
 }
 
+.lp-hero-pretitle {
+  color: #cfa75c;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: block;
+}
+
 .lp-hero-title {
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 800;
   color: white;
   line-height: 1.1;
@@ -496,68 +501,255 @@ body {
 }
 
 .lp-hero-desc {
-  font-size: 18px;
-  color: #cbd5e1;
+  font-size: 20px;
+  color: #e2e8f0;
   line-height: 1.6;
   margin-bottom: 40px;
-  max-width: 600px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .lp-hero-btn {
-  background: #d97706;
-  color: white;
+  background: #cfa75c;
+  color: #0b213f;
   padding: 16px 32px;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 16px;
   font-weight: 700;
   border: none;
   cursor: pointer;
 }
 
+/* Trust Badges */
+.lp-trust-badges {
+  background: #f8fafc;
+  padding: 40px 5%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  max-width: 250px;
+}
+
+.trust-icon {
+  color: #cfa75c;
+  font-size: 32px;
+}
+
+.trust-text h4 {
+  font-size: 14px;
+  color: #0b213f;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.trust-text p {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
 /* Services / Features */
 .lp-services {
-  padding: 80px 5%;
+  padding: 100px 5%;
   max-width: 1200px;
-  margin: -100px auto 0 auto;
-  position: relative;
-  z-index: 10;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.lp-section-title {
+  font-size: 36px;
+  font-family: "Georgia", serif;
+  color: #0b213f;
+  margin-bottom: 60px;
+}
+
+.lp-services-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 30px;
 }
 
 .lp-card {
   background: white;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  border-top: 4px solid #d97706;
+  padding: 40px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.3s;
+}
+
+.lp-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .lp-card-icon {
-  width: 50px;
-  height: 50px;
-  background: #f1f5f9;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #0f172a;
-  margin-bottom: 20px;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 24px auto;
+  color: #cfa75c;
 }
 
 .lp-card-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: #0f172a;
-  margin-bottom: 12px;
+  color: #0b213f;
+  margin-bottom: 16px;
 }
 
 .lp-card-desc {
-  font-size: 14px;
+  font-size: 15px;
   color: #64748b;
   line-height: 1.6;
+}
+
+/* Stats Section */
+.lp-stats {
+  display: flex;
+  background: #0b213f;
+  color: white;
+  padding: 80px 5%;
+}
+
+.lp-stats-content {
+  flex: 1;
+  padding-right: 50px;
+}
+
+.lp-stats-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.stat-item h3 {
+  font-size: 40px;
+  color: #cfa75c;
+  margin-bottom: 8px;
+}
+
+.stat-item p {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* Process Section */
+.lp-process {
+  padding: 100px 5%;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.process-steps {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1000px;
+  margin: 60px auto 0 auto;
+  position: relative;
+}
+
+.process-steps::before {
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  right: 50px;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.process-step {
+  position: relative;
+  z-index: 2;
+  width: 200px;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  background: #0b213f;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  border: 5px solid #f8fafc;
+}
+
+.step-title {
+  font-weight: 700;
+  color: #0b213f;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.step-desc {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Testimonials */
+.lp-testimonials {
+  padding: 100px 5%;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.test-card {
+  background: #f8fafc;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.test-quote {
+  font-style: italic;
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.test-author {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.test-author img {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+}
+
+.test-author-info h4 {
+  color: #0b213f;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.test-author-info p {
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 /* Auth Modal (Replacing Auth Container) */

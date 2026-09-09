@@ -251,10 +251,10 @@ export default function Home() {
         <nav className="lp-navbar">
           <div className="lp-logo">PHOENIXBANK</div>
           <div className="lp-nav-links">
-            <a href="#">Personal</a>
-            <a href="#">Business</a>
-            <a href="#">Cards</a>
-            <a href="#">About Us</a>
+            <a href="/personal">Personal</a>
+            <a href="/business">Business</a>
+            <a href="/cards">Cards</a>
+            <a href="/about">About Us</a>
           </div>
           <button className="lp-login-btn" onClick={() => setShowAuthModal(true)}>
             Access Account
@@ -264,40 +264,182 @@ export default function Home() {
         {/* Hero Section */}
         <section className="lp-hero">
           <div className="lp-hero-content">
-            <h1 className="lp-hero-title">Achieve Financial Success & Security</h1>
+            <span className="lp-hero-pretitle">Financial Guidance You Can Trust</span>
+            <h1 className="lp-hero-title">Smart Financial Decisions for a Stronger Future</h1>
             <p className="lp-hero-desc">
               Experience the next generation of banking with our Zero-Trust architecture. 
               Powered by event-driven microservices (Kafka), HashiCorp Vault threshold cryptography, 
               and real-time AI Fraud Detection.
             </p>
-            <button className="lp-hero-btn" onClick={() => setShowAuthModal(true)}>
-              Open Account
-            </button>
+            <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+              <button className="lp-hero-btn" onClick={() => setShowAuthModal(true)}>
+                Schedule a Consultation
+              </button>
+              <button className="lp-hero-btn" style={{ background: 'transparent', border: '1px solid white', color: 'white' }} onClick={() => window.scrollTo(0, 800)}>
+                Our Services &rarr;
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* Features / Services */}
+        {/* Trust Badges */}
+        <section className="lp-trust-badges">
+          <div className="trust-badge">
+            <div className="trust-icon">🛡️</div>
+            <div className="trust-text">
+              <h4>Fiduciary Standard</h4>
+              <p>We put your interests first, always.</p>
+            </div>
+          </div>
+          <div className="trust-badge">
+            <div className="trust-icon">🤝</div>
+            <div className="trust-text">
+              <h4>Independent Advice</h4>
+              <p>Objective guidance tailored to your goals.</p>
+            </div>
+          </div>
+          <div className="trust-badge">
+            <div className="trust-icon">📈</div>
+            <div className="trust-text">
+              <h4>Proven Strategies</h4>
+              <p>Strategies designed for today and tomorrow.</p>
+            </div>
+          </div>
+          <div className="trust-badge">
+            <div className="trust-icon">🔒</div>
+            <div className="trust-text">
+              <h4>Your Financial Privacy</h4>
+              <p>Your information is safe and secure with us.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Services Grid */}
         <section className="lp-services">
-          <div className="lp-card">
-            <div className="lp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          <h2 className="lp-section-title">Comprehensive Financial Solutions</h2>
+          <div className="lp-services-grid">
+            <div className="lp-card">
+              <div className="lp-card-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </div>
+              <h3 className="lp-card-title">Personal Banking</h3>
+              <p className="lp-card-desc">Build a clear roadmap to achieve your short and long-term financial goals with tailored checking and savings.</p>
+              <a href="/personal" style={{ display: 'block', marginTop: '20px', color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>LEARN MORE &rarr;</a>
             </div>
-            <h3 className="lp-card-title">Microservices</h3>
-            <p className="lp-card-desc">Event-driven architecture using Kafka for high-throughput, decoupled inter-service communication and eventual consistency.</p>
+            <div className="lp-card">
+              <div className="lp-card-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              </div>
+              <h3 className="lp-card-title">Business Advisory</h3>
+              <p className="lp-card-desc">Expert financial advice, robust merchant services, and scalable corporate accounts to help your business grow.</p>
+              <a href="/business" style={{ display: 'block', marginTop: '20px', color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>LEARN MORE &rarr;</a>
+            </div>
+            <div className="lp-card">
+              <div className="lp-card-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
+              <h3 className="lp-card-title">Zero-Trust Vault</h3>
+              <p className="lp-card-desc">Advanced key management featuring Shamir's Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault provisioning.</p>
+              <a href="/about" style={{ display: 'block', marginTop: '20px', color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>LEARN MORE &rarr;</a>
+            </div>
           </div>
-          <div className="lp-card">
-            <div className="lp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            </div>
-            <h3 className="lp-card-title">AI Fraud Detection</h3>
-            <p className="lp-card-desc">Real-time anomaly detection using scikit-learn Isolation Forests, instantly flagging suspicious transactions {">"} LKR 200,000.</p>
+        </section>
+
+        {/* Stats Section */}
+        <section className="lp-stats">
+          <div className="lp-stats-content">
+            <h2 style={{ fontSize: '36px', fontFamily: 'Georgia, serif', marginBottom: '20px' }}>Your Goals. Our Expertise. A Better Financial Future.</h2>
+            <p style={{ color: '#94a3b8', lineHeight: '1.6', marginBottom: '30px' }}>At PhoenixBank, we believe financial success comes from clarity, discipline, and a trusted partner.</p>
+            <ul style={{ listStyle: 'none', color: '#e2e8f0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <li>✓ Over 20 years of combined experience</li>
+              <li>✓ Personalized strategies for every stage of life</li>
+              <li>✓ Transparent advice and honest communication</li>
+              <li>✓ Committed to your long-term success</li>
+            </ul>
+            <button className="lp-hero-btn" style={{ marginTop: '40px' }}>Learn More About Us &rarr;</button>
           </div>
-          <div className="lp-card">
-            <div className="lp-card-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <div className="lp-stats-grid">
+            <div className="stat-item">
+              <h3>20+</h3>
+              <p>Years of Experience</p>
             </div>
-            <h3 className="lp-card-title">Zero-Trust Vault</h3>
-            <p className="lp-card-desc">Advanced key management featuring Shamir&apos;s Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault dynamic provisioning.</p>
+            <div className="stat-item">
+              <h3>1,000+</h3>
+              <p>Clients Served</p>
+            </div>
+            <div className="stat-item">
+              <h3>$750M+</h3>
+              <p>Assets Under Advisement</p>
+            </div>
+            <div className="stat-item">
+              <h3>98%</h3>
+              <p>Client Satisfaction</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Process Timeline */}
+        <section className="lp-process">
+          <h2 className="lp-section-title">A Simple Process. Powerful Results.</h2>
+          <div className="process-steps">
+            <div className="process-step">
+              <div className="step-icon">1</div>
+              <h4 className="step-title">Discover</h4>
+              <p className="step-desc">We start with a conversation to understand your goals, needs, and priorities.</p>
+            </div>
+            <div className="process-step">
+              <div className="step-icon">2</div>
+              <h4 className="step-title">Plan</h4>
+              <p className="step-desc">We create a customized financial plan designed to help you reach your goals.</p>
+            </div>
+            <div className="process-step">
+              <div className="step-icon">3</div>
+              <h4 className="step-title">Implement</h4>
+              <p className="step-desc">We put your plan into action with strategies built for growth and protection.</p>
+            </div>
+            <div className="process-step">
+              <div className="step-icon">4</div>
+              <h4 className="step-title">Monitor</h4>
+              <p className="step-desc">We review and adjust your plan regularly to keep you on track for success.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="lp-testimonials">
+          <span className="lp-hero-pretitle" style={{ color: '#64748b' }}>What Our Clients Say</span>
+          <h2 className="lp-section-title">Trusted by Individuals and Businesses</h2>
+          <div className="test-grid">
+            <div className="test-card">
+              <p className="test-quote">"PhoenixBank took the time to understand our goals and created a plan that gave us confidence in our future."</p>
+              <div className="test-author">
+                <img src="https://i.pravatar.cc/150?u=1" alt="Melissa R." />
+                <div className="test-author-info">
+                  <h4>Melissa R.</h4>
+                  <p>New York, NY</p>
+                </div>
+              </div>
+            </div>
+            <div className="test-card">
+              <p className="test-quote">"Professional, knowledgeable, and always responsive. They've been instrumental in helping our business grow."</p>
+              <div className="test-author">
+                <img src="https://i.pravatar.cc/150?u=2" alt="James T." />
+                <div className="test-author-info">
+                  <h4>James T.</h4>
+                  <p>Chicago, IL</p>
+                </div>
+              </div>
+            </div>
+            <div className="test-card">
+              <p className="test-quote">"Their advice is clear, honest, and always in our best interest. We highly recommend their team."</p>
+              <div className="test-author">
+                <img src="https://i.pravatar.cc/150?u=3" alt="Sarah L." />
+                <div className="test-author-info">
+                  <h4>Sarah L.</h4>
+                  <p>Austin, TX</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
