@@ -1,7 +1,7 @@
 # PhoenixBank 
 **Zero-Trust Banking Architecture & AI Fraud Engine**
 
-PhoenixBank is an enterprise-grade, event-driven banking platform designed for modern security and scalability. Built as a submission for a **DevOps & Security Competition**, this project demonstrates a highly robust microservices architecture leveraging Apache Kafka, HashiCorp Vault, and Machine Learning.
+PhoenixBank is an enterprise-grade, event-driven banking platform designed for modern security and scalability. Built as a submission for the **Duothon Hackathon**, this project demonstrates a highly robust microservices architecture leveraging Apache Kafka, HashiCorp Vault, and Machine Learning.
 
 ## Key Features
 
@@ -53,7 +53,7 @@ The entire secure infrastructure (Kafka, Zookeeper, Postgres, Redis, Vault, Kong
 
 ```bash
 # Bring up the complete secure stack
-docker-compose -f docker-compose.secure.yml up -d --build
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 ### 2. Manual Local Development (Optional)
@@ -98,4 +98,4 @@ For testing and evaluation purposes, you can use the following default demo cred
 *(Note: In a production environment, strict password policies, Vault key management, and multi-factor authentication are enforced).*
 
 ---
-*Built by Team Neural Ninjas for the DevOps Competition.*
+*Built for the Duothon Hackathon.*
