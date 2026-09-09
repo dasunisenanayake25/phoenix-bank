@@ -524,19 +524,17 @@ body {
 /* Trust Badges */
 .lp-trust-badges {
   background: #f8fafc;
-  padding: 40px 5%;
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 20px;
+  padding: 40px 2%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .trust-badge {
   display: flex;
   align-items: center;
-  gap: 15px;
-  max-width: 250px;
+  gap: 10px;
 }
 
 .trust-icon {
