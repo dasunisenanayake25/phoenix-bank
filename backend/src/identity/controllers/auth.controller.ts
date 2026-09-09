@@ -3,7 +3,7 @@ import { AuthService } from '../services/auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
-@Controller('api/accounts')
+@Controller('accounts')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
