@@ -43,38 +43,38 @@ export default function AboutUs() {
         <h2 style={{ fontSize: '32px', color: '#0056b3', textAlign: 'center', marginBottom: '24px', fontWeight: 'bold' }}>Our Team</h2>
         
         <div className="team-grid">
-          {/* Member 1: Kanishka */}
+          {/* Member 1: Ravindu Anushka */}
           <div className="team-card">
-            <div className="team-card-image-container" style={{ backgroundImage: 'url("/kanishka.jpg")' }}>
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/ravindu.jpg")' }}>
               <div className="team-card-overlay">
-                <div className="team-card-name">Kanishka Gunasinghe</div>
+                <div className="team-card-name">Ravindu Anushka</div>
               </div>
             </div>
           </div>
 
-          {/* Member 2: Tharunethu */}
+          {/* Member 2: Dasuni Senanayake */}
           <div className="team-card">
-            <div className="team-card-image-container" style={{ backgroundImage: 'url("/tharunethu.jpg")' }}>
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/dasuni.jpg")' }}>
               <div className="team-card-overlay">
-                <div className="team-card-name">Tharunethu Wanniarachchi</div>
+                <div className="team-card-name">Dasuni Senanayake</div>
               </div>
             </div>
           </div>
 
-          {/* Member 3: Levindu */}
+          {/* Member 3: Chalindu Kalhara */}
           <div className="team-card">
-            <div className="team-card-image-container" style={{ backgroundImage: 'url("/levindu.jpg")' }}>
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/chalindu.jpg")' }}>
               <div className="team-card-overlay">
-                <div className="team-card-name">Levindu Herath</div>
+                <div className="team-card-name">Chalindu Kalhara</div>
               </div>
             </div>
           </div>
 
-          {/* Member 4: Imal */}
+          {/* Member 4: Manuthi Kasuntha */}
           <div className="team-card">
-            <div className="team-card-image-container" style={{ backgroundImage: 'url("/imal.jpg")' }}>
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/manuthi.jpg")' }}>
               <div className="team-card-overlay">
-                <div className="team-card-name">Imal Pasindu Hathnagoda</div>
+                <div className="team-card-name">Manuthi Kasuntha</div>
               </div>
             </div>
           </div>
