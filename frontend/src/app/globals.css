@@ -785,6 +785,85 @@ body {
   font-size: 12px;
 }
 
+/* Team Section */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.team-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.team-card-image-container {
+  position: relative;
+  height: 280px;
+  background-size: cover;
+  background-position: center top;
+  background-color: #e2e8f0;
+}
+
+.team-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 20px 20px 20px;
+  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, transparent 100%);
+  color: white;
+}
+
+.team-card-name {
+  color: #0ea5e9; /* Bright Sky Blue */
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.team-card-role {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.team-card-details {
+  padding: 20px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.team-card-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: #334155;
+}
+
+.team-card-icon {
+  width: 16px;
+  height: 16px;
+  color: #0ea5e9;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  .lp-trust-badges {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Auth Modal (Replacing Auth Container) */
 .auth-modal-overlay {
   position: fixed;
