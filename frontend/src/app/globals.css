@@ -457,15 +457,15 @@ body {
   border-radius: 4px;
   font-weight: 700;
   font-size: 14px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .lp-login-btn:hover {
   background: #e6c587;
-  border-color: #cfa75c;
-  box-shadow: 0 0 15px rgba(207, 167, 92, 0.6); /* Shining orange glow */
+  border-color: #ff9800; /* Bright Orange Border */
+  box-shadow: 0 0 20px rgba(255, 152, 0, 0.8), 0 0 40px rgba(255, 152, 0, 0.4); /* Intense Shining Orange Glow */
 }
 
 /* Hero Section */
@@ -519,15 +519,15 @@ body {
   border-radius: 4px;
   font-size: 16px;
   font-weight: 700;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .lp-hero-btn:hover {
   background: #e6c587;
-  border-color: #cfa75c;
-  box-shadow: 0 0 15px rgba(207, 167, 92, 0.6); /* Shining orange glow */
+  border-color: #ff9800; /* Bright Orange Border */
+  box-shadow: 0 0 20px rgba(255, 152, 0, 0.8), 0 0 40px rgba(255, 152, 0, 0.4); /* Intense Shining Orange Glow */
 }
 
 /* Service Card (Inner Pages) */
