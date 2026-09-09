@@ -982,5 +982,19 @@ body {
     max-width: 1000px;
   }
 }
-\ n \ n / *   D a r k   M o d e   M a g i c   F i l t e r   * / \ n h t m l . d a r k - t h e m e   { \ n     f i l t e r :   i n v e r t ( 1 )   h u e - r o t a t e ( 1 8 0 d e g ) ; \ n     b a c k g r o u n d - c o l o r :   # 1 1 1 ; \ n } \ n \ n h t m l . d a r k - t h e m e   i m g , \ n h t m l . d a r k - t h e m e   v i d e o , \ n h t m l . d a r k - t h e m e   s v g , \ n h t m l . d a r k - t h e m e   . l p - h e r o , \ n h t m l . d a r k - t h e m e   . t e a m - c a r d - i m a g e - c o n t a i n e r , \ n h t m l . d a r k - t h e m e   . a u t h - m o d a l - o v e r l a y   { \ n     f i l t e r :   i n v e r t ( 1 )   h u e - r o t a t e ( 1 8 0 d e g ) ; \ n }  
- 
+
+
+/* Dark Mode Magic Filter */
+html.dark-theme {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #111;
+}
+
+html.dark-theme img,
+html.dark-theme video,
+html.dark-theme svg,
+html.dark-theme .lp-hero,
+html.dark-theme .team-card-image-container,
+html.dark-theme .auth-modal-overlay {
+  filter: invert(1) hue-rotate(180deg);
+}
