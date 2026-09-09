@@ -52,7 +52,7 @@ export default function Home() {
   const [isTransferring, setIsTransferring] = useState(false);
 
   // Favorites
-  const [savedContacts, setSavedContacts] = useState<{ id: string; name: string }[]>([
+  const [savedContacts] = useState<{ id: string; name: string }[]>([
     { id: "2", name: "Amila" },
     { id: "3", name: "Kamal" },
     { id: "4", name: "Nimal" },
@@ -353,7 +353,7 @@ export default function Home() {
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               </div>
               <h3 className="lp-card-title">Zero-Trust Vault</h3>
-              <p className="lp-card-desc">Advanced key management featuring Shamir's Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault provisioning.</p>
+              <p className="lp-card-desc">Advanced key management featuring Shamir&apos;s Secret Sharing (3-of-5 threshold) and automated HashiCorp Vault provisioning.</p>
               <a href="/about" style={{ display: 'block', marginTop: '20px', color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>LEARN MORE &rarr;</a>
             </div>
           </div>

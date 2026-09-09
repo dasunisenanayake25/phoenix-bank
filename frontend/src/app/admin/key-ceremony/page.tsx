@@ -40,7 +40,7 @@ export default function KeyCeremonyPage() {
           message: data.message || 'Failed to reconstruct the master key.',
         });
       }
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: 'Network error or server unavailable. Please try again.',
