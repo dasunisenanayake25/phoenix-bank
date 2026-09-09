@@ -2,7 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { AccountsService } from './accounts.service';
 
-@Controller('accounts')
+@Controller('api/accounts')
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
