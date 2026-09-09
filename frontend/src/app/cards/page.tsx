@@ -39,7 +39,6 @@ export default function CardsBanking() {
             </div>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Signature Rewards</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Earn 3X points on dining and travel. No foreign transaction fees.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Apply Now &rarr;</Link>
           </div>
           
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -49,7 +48,6 @@ export default function CardsBanking() {
             </div>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Reserve Elite</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Exclusive airport lounge access, 24/7 concierge, and premium travel insurance.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Apply Now &rarr;</Link>
           </div>
 
         </div>
