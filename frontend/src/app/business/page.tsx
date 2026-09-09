@@ -35,17 +35,14 @@ export default function BusinessBanking() {
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Corporate Accounts</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Streamline your cash flow management with our advanced corporate checking and savings tools.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Merchant Services</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Accept payments seamlessly globally with our secure, Zero-Trust integrated API gateway.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Commercial Lending</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Fuel your growth with flexible credit lines and commercial real estate financing.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
         </div>
       </div>
