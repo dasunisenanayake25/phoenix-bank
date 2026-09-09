@@ -582,12 +582,13 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   border: 1px solid #f1f5f9;
-  transition: transform 0.3s;
+  transition: all 0.3s ease;
 }
 
 .lp-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-color: #3b82f6; /* Blue border */
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 10px 30px rgba(0,0,0,0.1); /* Shining blue glow */
 }
 
 .lp-card-icon {
@@ -595,6 +596,11 @@ body {
   height: 60px;
   margin: 0 auto 24px auto;
   color: #cfa75c;
+  transition: color 0.3s ease;
+}
+
+.lp-card:hover .lp-card-icon {
+  color: #3b82f6; /* Change icon to blue on hover */
 }
 
 .lp-card-title {
@@ -718,6 +724,14 @@ body {
   padding: 40px;
   border-radius: 8px;
   text-align: left;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.test-card:hover {
+  transform: translateY(-5px);
+  border-color: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .test-quote {
