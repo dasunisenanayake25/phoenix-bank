@@ -51,7 +51,15 @@ export default function AboutUs() {
               </div>
             </div>
           </div>
-
+          {/* Member 2: Dasuni Senanayake */}
+          <div className="team-card">
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/dasuni.jpg")' }}>
+              <div className="team-card-overlay">
+                <div className="team-card-name">Dasuni Senanayake</div>
+              </div>
+            </div>
+          </div>
+        
           {/* Member 2: Manuthi Kasuntha */}
           <div className="team-card">
             <div className="team-card-image-container" style={{ backgroundImage: 'url("/manuthi.jpg")' }}>
@@ -70,11 +78,11 @@ export default function AboutUs() {
             </div>
           </div>
 
-          {/* Member 4: Dasuni Senanayake */}
+          {/* Member 4: Manuthi Kasuntha */}
           <div className="team-card">
-            <div className="team-card-image-container" style={{ backgroundImage: 'url("/dasuni.jpg")' }}>
+            <div className="team-card-image-container" style={{ backgroundImage: 'url("/manuthi.jpg")' }}>
               <div className="team-card-overlay">
-                <div className="team-card-name">Dasuni Senanayake</div>
+                <div className="team-card-name">Manuthi Kasuntha</div>
               </div>
             </div>
           </div>
