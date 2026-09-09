@@ -82,10 +82,17 @@ export default function Home() {
       }
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch balance.");
+        if (!res.ok) {
+          if (res.status === 404 || res.status === 401) {
+            localStorage.removeItem("@phoenix_session_user");
+            setCurrentUser(null);
+          }
+          return null;
+        }
         return res.json();
       })
       .then((data) => {
+        if (!data) return;
         setCurrentUser((previousUser) => {
           const updated = {
             id: accId,
