@@ -40,7 +40,7 @@ export default function AboutUs() {
           </p>
         </div>
 
-        <h2 style={{ fontSize: '32px', color: '#0056b3', textAlign: 'center', marginBottom: '24px', fontWeight: 'bold' }}>Our Team</h2>
+        <h2 style={{ fontSize: '32px', color: '#0b213f', textAlign: 'center', marginBottom: '24px', fontFamily: 'Georgia, serif' }}>Our Team</h2>
         
         <div className="team-grid">
           {/* Member 1: Ravindu Anushka */}

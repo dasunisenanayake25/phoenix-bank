@@ -818,12 +818,14 @@ body {
   padding: 40px 20px 20px 20px;
   background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, transparent 100%);
   color: white;
+  text-align: center;
 }
 
 .team-card-name {
   color: #0ea5e9; /* Bright Sky Blue */
+  font-family: "Georgia", serif;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
   margin-bottom: 4px;
 }
 
