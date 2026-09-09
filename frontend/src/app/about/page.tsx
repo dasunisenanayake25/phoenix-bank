@@ -48,7 +48,6 @@ export default function AboutUs() {
             <div className="team-card-image-container" style={{ backgroundImage: 'url("/kanishka.jpg")' }}>
               <div className="team-card-overlay">
                 <div className="team-card-name">Kanishka Gunasinghe</div>
-                <div className="team-card-role">Project Manager/ Full Stack Developer</div>
               </div>
             </div>
           </div>
@@ -58,7 +57,6 @@ export default function AboutUs() {
             <div className="team-card-image-container" style={{ backgroundImage: 'url("/tharunethu.jpg")' }}>
               <div className="team-card-overlay">
                 <div className="team-card-name">Tharunethu Wanniarachchi</div>
-                <div className="team-card-role">UX UI designer/ Full Stack Developer</div>
               </div>
             </div>
           </div>
@@ -68,7 +66,6 @@ export default function AboutUs() {
             <div className="team-card-image-container" style={{ backgroundImage: 'url("/levindu.jpg")' }}>
               <div className="team-card-overlay">
                 <div className="team-card-name">Levindu Herath</div>
-                <div className="team-card-role">Mobile Developer</div>
               </div>
             </div>
           </div>
@@ -78,7 +75,6 @@ export default function AboutUs() {
             <div className="team-card-image-container" style={{ backgroundImage: 'url("/imal.jpg")' }}>
               <div className="team-card-overlay">
                 <div className="team-card-name">Imal Pasindu Hathnagoda</div>
-                <div className="team-card-role">Full Stack Developer</div>
               </div>
             </div>
           </div>
