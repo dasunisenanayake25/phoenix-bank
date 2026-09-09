@@ -35,17 +35,14 @@ export default function PersonalBanking() {
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Checking Accounts</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>No hidden fees, real-time alerts, and seamless integration with our mobile app.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>High-Yield Savings</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Grow your wealth faster with industry-leading interest rates and zero minimum balances.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
           <div className="service-card" style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '24px', color: '#0b213f', marginBottom: '15px' }}>Home Loans</h3>
             <p style={{ color: '#64748b', lineHeight: '1.6', marginBottom: '20px' }}>Competitive rates and a streamlined application process to get you into your dream home.</p>
-            <Link href="/" style={{ color: '#cfa75c', fontWeight: 'bold', textDecoration: 'none' }}>Learn More &rarr;</Link>
           </div>
         </div>
       </div>
